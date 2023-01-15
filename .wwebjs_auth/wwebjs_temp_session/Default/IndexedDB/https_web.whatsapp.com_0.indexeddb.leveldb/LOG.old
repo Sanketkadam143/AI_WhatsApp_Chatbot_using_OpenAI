@@ -1,0 +1,52 @@
+2023/01/15-14:42:31.068 55f3 Reusing MANIFEST /home/sanket/projects/aichatbot/.wwebjs_auth/RemoteAuth/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2023/01/15-14:42:31.068 55f3 Recovering log #1373
+2023/01/15-14:42:31.155 55f3 Reusing old log /home/sanket/projects/aichatbot/.wwebjs_auth/RemoteAuth/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/001373.log 
+2023/01/15-14:42:32.021 55f3 Level-0 table #1390: started
+2023/01/15-14:42:32.046 55f3 Level-0 table #1390: 1056771 bytes OK
+2023/01/15-14:42:32.051 55f3 Delete type=0 #1373
+2023/01/15-14:42:41.748 5602 Compacting 1@0 + 1@1 files
+2023/01/15-14:42:41.785 5602 Generated table #1391@0: 35414 keys, 583211 bytes
+2023/01/15-14:42:41.792 5602 Generated table #1392@0: 2487 keys, 153769 bytes
+2023/01/15-14:42:41.805 5602 Generated table #1393@0: 10237 keys, 211902 bytes
+2023/01/15-14:42:41.805 5602 Compacted 1@0 + 1@1 files => 948882 bytes
+2023/01/15-14:42:41.807 5602 compacted to: files[ 0 3 33 0 0 0 0 ]
+2023/01/15-14:42:41.807 5602 Delete type=2 #1377
+2023/01/15-14:42:41.807 5602 Delete type=2 #1390
+2023/01/15-14:42:42.476 55f6 Compacting 1@1 + 11@2 files
+2023/01/15-14:42:42.551 55f6 Generated table #1394@1: 48466 keys, 2239795 bytes
+2023/01/15-14:42:42.572 55f6 Generated table #1395@1: 2479 keys, 2146983 bytes
+2023/01/15-14:42:42.596 55f6 Generated table #1396@1: 3056 keys, 2160507 bytes
+2023/01/15-14:42:42.619 55f6 Generated table #1397@1: 3127 keys, 2151972 bytes
+2023/01/15-14:42:42.639 55f6 Generated table #1398@1: 2429 keys, 2151501 bytes
+2023/01/15-14:42:42.662 55f6 Generated table #1399@1: 3950 keys, 2154429 bytes
+2023/01/15-14:42:42.684 55f6 Generated table #1400@1: 3252 keys, 2154634 bytes
+2023/01/15-14:42:42.704 55f6 Generated table #1401@1: 2531 keys, 2154777 bytes
+2023/01/15-14:42:42.722 55f6 Generated table #1402@1: 2769 keys, 1550686 bytes
+2023/01/15-14:42:42.722 55f6 Compacted 1@1 + 11@2 files => 18865284 bytes
+2023/01/15-14:42:42.725 55f6 compacted to: files[ 0 2 31 0 0 0 0 ]
+2023/01/15-14:42:42.725 55f6 Delete type=2 #1123
+2023/01/15-14:42:42.725 55f6 Delete type=2 #1386
+2023/01/15-14:42:42.725 55f6 Delete type=2 #1050
+2023/01/15-14:42:42.725 55f6 Delete type=2 #1391
+2023/01/15-14:42:42.725 55f6 Delete type=2 #1385
+2023/01/15-14:42:42.725 55f6 Delete type=2 #1126
+2023/01/15-14:42:42.725 55f6 Delete type=2 #1049
+2023/01/15-14:42:42.725 55f6 Delete type=2 #1127
+2023/01/15-14:42:42.725 55f6 Delete type=2 #1124
+2023/01/15-14:42:42.725 55f6 Delete type=2 #1125
+2023/01/15-14:42:42.725 55f6 Delete type=2 #1128
+2023/01/15-14:42:42.725 55f6 Delete type=2 #1387
+2023/01/15-14:42:43.779 55f6 Compacting 1@1 + 10@2 files
+2023/01/15-14:42:43.833 55f6 Generated table #1403@1: 25630 keys, 2189692 bytes
+2023/01/15-14:42:43.898 55f6 Generated table #1404@1: 31058 keys, 2253451 bytes
+2023/01/15-14:42:43.961 55f6 Generated table #1405@1: 26482 keys, 2267941 bytes
+2023/01/15-14:42:44.058 55f6 Generated table #1406@1: 28075 keys, 2257910 bytes
+2023/01/15-14:42:44.117 55f6 Generated table #1407@1: 26044 keys, 2248957 bytes
+2023/01/15-14:42:44.177 55f6 Generated table #1408@1: 28159 keys, 2250060 bytes
+2023/01/15-14:42:44.202 55f6 Generated table #1409@1: 4104 keys, 2121950 bytes
+2023/01/15-14:42:44.235 55f6 Generated table #1410@1: 12358 keys, 2135674 bytes
+2023/01/15-14:42:44.274 55f6 Generated table #1411@1: 11202 keys, 2138757 bytes
+2023/01/15-14:42:44.371 55f6 Generated table #1412@1: 109518 keys, 2262975 bytes
+2023/01/15-14:42:44.380 55f6 Generated table #1413@1: 6384 keys, 143616 bytes
+2023/01/15-14:42:44.380 55f6 Compacted 1@1 + 10@2 files => 22270983 bytes
+2023/01/15-14:42:44.383 55f6 compacted to: files[ 0 1 32 0 0 0 0 ]
