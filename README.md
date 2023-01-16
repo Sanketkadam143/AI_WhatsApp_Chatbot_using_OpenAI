@@ -19,6 +19,13 @@ A chatbot built using Node.js, MongoDB, WhatsApp API, and OpenAI API to assist u
 - [MongoDB](https://www.mongodb.com/) - Database
 - [OpenAI API](https://openai.com/) - API for providing accurate and appropriate responses
 
+##Demo
+<a href="https://www.youtube.com/watch?v=mxfWSxyUITI">
+  <img src="https://postimg.cc/jCDcWPYF" alt="video-name" width="240" height="180" border="10" />
+</a>
+
+
+
 ## Authors
 
 - **Sanket Kadam** - [Sanketkadam143](https://github.com/Sanketkadam143)
