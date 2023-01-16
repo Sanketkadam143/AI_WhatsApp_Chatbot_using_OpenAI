@@ -9,11 +9,11 @@ let client;
 // Load the session data
 function auth() {
   return new Promise((resolve, reject) => {
-    mongoose.set("strictQuery", false);
-    mongoose
-      .connect(process.env.MONGODB_URI)
-      .then(() => {
-        try {
+    try {
+      mongoose.set("strictQuery", false);
+      mongoose
+        .connect(process.env.MONGODB_URI)
+        .then(() => {
           const store = new MongoStore({ mongoose: mongoose });
           store.sessionExists({ session: "RemoteAuth" }).then((exists) => {
             if (exists) {
@@ -28,6 +28,9 @@ function auth() {
                       store: store,
                       backupSyncIntervalMs: 300000,
                     }),
+                    puppeteer: {
+                      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+                    },
                   });
                   client.initialize();
                   client.on("ready", () => {
@@ -41,6 +44,9 @@ function auth() {
                   store: store,
                   backupSyncIntervalMs: 300000,
                 }),
+                puppeteer: {
+                  args: ["--no-sandbox", "--disable-setuid-sandbox"],
+                },
               });
               client.initialize();
               client.on("qr", (qr) => {
@@ -52,13 +58,13 @@ function auth() {
               });
             }
           });
-        } catch (error) {
-          reject(error);
-        }
-      })
-      .catch((err) => {
-        reject(err);
-      });
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 

@@ -50,6 +50,6 @@ async function gptResponse(message) {
     return res.data.choices[0].text;
   } catch (err) {
     console.error(err);
-    return "Error: Unable to reach OpenAI API.";
+    return "AI is unavailable";
   }
 }
