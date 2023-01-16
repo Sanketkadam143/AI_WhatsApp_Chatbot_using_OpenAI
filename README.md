@@ -20,7 +20,7 @@ A chatbot built using Node.js, MongoDB, WhatsApp API, and OpenAI API to assist u
 - [OpenAI API](https://openai.com/) - API for providing accurate and appropriate responses
 
 ## Demo
-[![chatbot-definition-avantages-fonctions-marques.jpg](https://i.postimg.cc/pVZ66JGR/chatbot-definition-avantages-fonctions-marques.jpg)](https://www.youtube.com/watch?v=mxfWSxyUITI)
+[![chatbot-definition-avantages-fonctions-marques.jpg](https://i.postimg.cc/pVZ66JGR/chatbot-definition-avantages-fonctions-marques.jpg)](https://www.youtube.com/watch?v=mxfWSxyUITI){:height="50%" width="50%"}
 
 ## Authors
 
