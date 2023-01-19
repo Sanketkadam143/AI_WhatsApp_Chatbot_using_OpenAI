@@ -1,4 +1,5 @@
 const { Configuration, OpenAIApi } = require("openai");
+const { MessageMedia } = require("whatsapp-web.js");
 require("dotenv").config();
 const auth = require("./auth");
 const responses = require("./replies");
@@ -9,59 +10,83 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 auth()
-  .then((client) =>
-    client.on("message", async (msg) => {
-      isMention = msg.body.includes(`@${client.info.me.user}`);
-      if (msg.body == `@${client.info.me.user}`) {
-        try {
-          msg.reply(`How can I help you ${msg._data.notifyName} ?`);
-        } catch (error) {
-          console.log(error);
-        }
-      } else {
-        if (msg.body.startsWith("#") || isMention) {
-          let index = responses.findIndex((response) =>
-            msg.body.toLowerCase().includes(response.que.toLowerCase())
-          );
-          if (index >= 0) {
-            try {
-              msg.reply(responses[index]?.ans);
-            } catch (error) {
-              console.log(error);
-            }
-          } else {
-            try {
-              const chat = await msg.getChat();
+  .then(async (client) => {
+    try {
+      client.on("message", async (msg) => {
+        const { body, _data } = msg;
+        const { me } = client.info;
+        const isMention = body.includes(`@${me.user}`);
+        switch (true) {
+          case body === `@${me.user}`:
+            msg.reply(`How can I help you ${_data.notifyName} ?`);
+            break;
+          case body.startsWith("#") || isMention:
+            const index = responses.findIndex((response) =>
+              body.toLowerCase().includes(response.que.toLowerCase())
+            );
+            if (index >= 0) {
+              msg.reply(responses[index].ans);
+            } else {
               const prompt = isMention
-                ? msg.body.substring(13)
-                : msg.body.substring(1);
+                ? body.substring(me.user.length + 1)
+                : body.substring(1);
+              const chat = await msg.getChat();
               chat.sendStateTyping();
-              gptResponse(prompt)
-                .then((result) => {
-                  msg.reply(result);
-                  chat.clearState();
-                })
-                .catch((err) => console.log(err));
+              try {
+                const result = await gptResponse(prompt);
+                msg.reply(result);
+                chat.clearState();
+              } catch (error) {
+                console.log(error);
+              }
+            }
+            break;
+          case body.startsWith("*"):
+            const prompt = body.substring(1);
+            const chat = await msg.getChat();
+            chat.sendStateTyping();
+            try {
+              const imgurl = await dalleResponse(prompt);
+              const img = await MessageMedia.fromUrl(imgurl);
+              msg.reply(img);
+              chat.clearState();
             } catch (error) {
+              msg.reply("Image Unavailable");
               console.log(error);
             }
-          }
+            break;
         }
-      }
-    })
-  )
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  })
   .catch((error) => console.log(error));
 
-async function gptResponse(message) {
+async function gptResponse(prompt) {
   try {
     const res = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: message,
+      prompt: prompt,
       max_tokens: 200,
     });
     return res.data.choices[0].text;
   } catch (err) {
     console.error(err);
     return "AI is unavailable";
+  }
+}
+
+async function dalleResponse(prompt) {
+  try {
+    const response = await openai.createImage({
+      prompt: prompt,
+      n: 1,
+      size: "256x256",
+    });
+    return (image_url = response.data.data[0].url);
+  } catch (error) {
+    console.log(error);
+    return "Unable to reach DALL-E";
   }
 }

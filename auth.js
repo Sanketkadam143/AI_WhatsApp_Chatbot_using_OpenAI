@@ -26,7 +26,7 @@ function auth() {
                   client = new Client({
                     authStrategy: new RemoteAuth({
                       store: store,
-                      backupSyncIntervalMs: 300000,
+                      backupSyncIntervalMs: 3600000,
                     }),
                     puppeteer: {
                       args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -42,7 +42,7 @@ function auth() {
               client = new Client({
                 authStrategy: new RemoteAuth({
                   store: store,
-                  backupSyncIntervalMs: 300000,
+                  backupSyncIntervalMs: 3600000,
                 }),
                 puppeteer: {
                   args: ["--no-sandbox", "--disable-setuid-sandbox"],
