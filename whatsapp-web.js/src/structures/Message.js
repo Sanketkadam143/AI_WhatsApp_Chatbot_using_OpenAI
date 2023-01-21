@@ -330,8 +330,9 @@ class Message extends Base {
 
         options = {
             ...options,
-            quotedMessageId: this.id._serialized
+            quotedMessageId: this.id ? this.id._serialized : null
         };
+        
 
         return this.client.sendMessage(chatId, content, options);
     }
