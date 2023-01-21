@@ -1,5 +1,5 @@
 const { Configuration, OpenAIApi } = require("openai");
-const { MessageMedia } = require("whatsapp-web.js");
+const { MessageMedia } = require("./whatsapp-web.js");
 require("dotenv").config();
 const auth = require("./auth");
 const responses = require("./replies");
@@ -17,7 +17,7 @@ auth()
         const { me } = client.info;
         const isMention = body.includes(`@${me.user}`);
         switch (true) {
-          case body === `@${me.user}`:
+          case body === `@${me.user}` || body==='*' || body ==='#':
             msg.reply(`How can I help you ${_data.notifyName} ?`);
             break;
           case body.startsWith("#") || isMention:
