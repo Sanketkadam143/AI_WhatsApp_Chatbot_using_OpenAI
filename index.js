@@ -17,7 +17,7 @@ auth()
         const { me } = client.info;
         const isMention = body.includes(`@${me.user}`);
         switch (true) {
-          case body === `@${me.user}` || body==='*' || body ==='#':
+          case body === `@${me.user}` || body === "*" || body === "#":
             msg.reply(`How can I help you ${_data.notifyName} ?`);
             break;
           case body.startsWith("#") || isMention:
@@ -26,6 +26,10 @@ auth()
             );
             if (index >= 0) {
               msg.reply(responses[index].ans);
+            } else if (body.length < 10) {
+              msg.reply(
+                `Hey ${_data.notifyName} please be more brief to generate accurate response.`
+              );
             } else {
               const prompt = isMention
                 ? body.substring(me.user.length + 1)
@@ -42,17 +46,23 @@ auth()
             }
             break;
           case body.startsWith("*"):
-            const prompt = body.substring(1);
-            const chat = await msg.getChat();
-            chat.sendStateTyping();
-            try {
-              const imgurl = await dalleResponse(prompt);
-              const img = await MessageMedia.fromUrl(imgurl);
-              msg.reply(img);
-              chat.clearState();
-            } catch (error) {
-              msg.reply("Image Unavailable");
-              console.log(error);
+            if (body.length < 15) {
+              msg.reply(
+                `Hey ${_data.notifyName} please give more info of image you want to generate.`
+              );
+            } else {
+              const prompt = body.substring(1);
+              const chat = await msg.getChat();
+              chat.sendStateTyping();
+              try {
+                const imgurl = await dalleResponse(prompt);
+                const img = await MessageMedia.fromUrl(imgurl);
+                msg.reply(img);
+                chat.clearState();
+              } catch (error) {
+                msg.reply("Image Unavailable");
+                console.log(error);
+              }
             }
             break;
         }

@@ -7,6 +7,12 @@ const responses = [
   },
   { que: "what's your name", ans: "My name is Sanket " },
   { que: "tell me your name", ans: "My name is Sanket " },
+  { que: "hii", ans: "Hello!,How can i help you? " },
+  { que: "hello", ans: "Hii!,How can i help you? " },
+  { que: "gm", ans: "Good Morning !! " },
+  { que: "gn", ans: "Good Night" },
+  { que: "hiii", ans: "Hello!,How can i help you? " },
+  { que: "hi", ans: "Hello!,How can i help you? " },
 ];
 
 module.exports = responses;
