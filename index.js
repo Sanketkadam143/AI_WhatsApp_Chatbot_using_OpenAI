@@ -21,8 +21,9 @@ auth()
             msg.reply(`How can I help you ${_data.notifyName} ?`);
             break;
           case body.startsWith("#") || isMention:
-            const index = responses.findIndex((response) =>
-              body.toLowerCase().includes(response.que.toLowerCase())
+            const index = responses.findIndex(
+              (response) =>
+                body.substring(1).toLowerCase() == response.que.toLowerCase()
             );
             if (index >= 0) {
               msg.reply(responses[index].ans);
