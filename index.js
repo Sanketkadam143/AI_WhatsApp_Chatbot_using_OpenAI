@@ -46,7 +46,7 @@ auth()
               }
             }
             break;
-          case body.startsWith("*"):
+          case body.startsWith("*") && !body.substring(1).includes("*"):
             if (body.length < 15) {
               msg.reply(
                 `Hey ${_data.notifyName} please give more info of image you want to generate.`
