@@ -1,5 +1,5 @@
-# Use a Node.js base image
-FROM node:18.7.0-slim
+# Use a smaller base image
+FROM node:18.7.0-alpine
 
 # Set the working directory
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install --production
 
 # Copy the .env file
 COPY .env ./
