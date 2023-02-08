@@ -16,14 +16,17 @@ auth()
         const { body, _data } = msg;
         const { me } = client.info;
         const isMention = body.includes(`@${me.user}`);
+        const chat = await msg.getChat();
+        const isgrp = chat.isGroup;
         switch (true) {
           case body === `@${me.user}` || body === "*" || body === "#":
             msg.reply(`How can I help you ${_data.notifyName} ?`);
             break;
-          case body.startsWith("#") || isMention:
-            const index = responses.findIndex(
-              (response) =>
-                body.substring(1).toLowerCase() == response.que.toLowerCase()
+          case body.startsWith("#") || isMention || !isgrp:
+            const index = responses.findIndex((response) =>
+              body.startsWith("#")
+                ? body.substring(1).toLowerCase() == response.que.toLowerCase()
+                : body.toLowerCase() == response.que.toLowerCase()
             );
             if (index >= 0) {
               msg.reply(responses[index].ans);
@@ -34,8 +37,9 @@ auth()
             } else {
               const prompt = isMention
                 ? body.substring(me.user.length + 1)
-                : body.substring(1);
-              const chat = await msg.getChat();
+                : body.startsWith("#")
+                ? body.substring(1)
+                : body;
               chat.sendStateTyping();
               try {
                 const result = await gptResponse(prompt);
@@ -53,7 +57,6 @@ auth()
               );
             } else {
               const prompt = body.substring(1);
-              const chat = await msg.getChat();
               chat.sendStateTyping();
               try {
                 const imgurl = await dalleResponse(prompt);
