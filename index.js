@@ -1,5 +1,5 @@
 const { Configuration, OpenAIApi } = require("openai");
-const { MessageMedia } = require("whatsapp-web.js");
+const { MessageMedia } = require("./whatsapp-web.js");
 require("dotenv").config();
 const auth = require("./auth");
 const responses = require("./replies");
