@@ -1,4 +1,4 @@
-const { Client, RemoteAuth } = require("./whatsapp-web.js");
+const { Client, RemoteAuth } = require("./whatsapp-web.js/index.js");
 const qrcode = require("qrcode-terminal");
 
 // Require database
