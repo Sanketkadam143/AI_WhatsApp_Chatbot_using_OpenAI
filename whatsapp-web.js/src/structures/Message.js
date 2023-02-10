@@ -55,7 +55,7 @@ class Message extends Base {
          * Message type
          * @type {MessageTypes}
          */
-        this.type = data.type;
+        this.type = data?.type;
 
         /**
          * Unix timestamp for when the message was created
@@ -330,7 +330,7 @@ class Message extends Base {
 
         options = {
             ...options,
-            quotedMessageId: this.id._serialized
+            quotedMessageId: this.id?._serialized
         };
 
         return this.client.sendMessage(chatId, content, options);
@@ -505,7 +505,7 @@ class Message extends Base {
      * @return {Promise<Order>}
      */
     async getOrder() {
-        if (this?.type === MessageTypes.ORDER) {
+        if (this.type === MessageTypes.ORDER) {
             const result = await this.client.pupPage.evaluate((orderId, token, chatId) => {
                 return window.WWebJS.getOrderDetail(orderId, token, chatId);
             }, this.orderId, this.token, this._getChatId());
@@ -519,7 +519,7 @@ class Message extends Base {
      * @return {Promise<Payment>}
      */
     async getPayment() {
-        if (this?.type === MessageTypes.PAYMENT) {
+        if (this.type === MessageTypes.PAYMENT) {
             const msg = await this.client.pupPage.evaluate(async (msgId) => {
                 const msg = window.Store.Msg.get(msgId);
                 if(!msg) return null;
