@@ -9,10 +9,6 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-// auth()
-//   .then(async (client) => {})
-//   .catch((error) => console.log(error));
-
 async function bot() {
   try {
     const client = await auth();
@@ -52,7 +48,6 @@ async function bot() {
           }
           break;
         case body.startsWith("#") || isMention || !isgrp:
-          console.log(body);
           const index = responses.findIndex((response) =>
             body.startsWith("#")
               ? body.substring(1).toLowerCase() == response.que.toLowerCase()
@@ -70,9 +65,19 @@ async function bot() {
               : body.startsWith("#")
               ? body.substring(1)
               : body;
+            const pastMessage = await chat.fetchMessages({ limit: 10 });
+            let pastinfo = [];
+            pastMessage.forEach((past) => {
+              if (past.id.fromMe) {
+                pastinfo.push({ role: "assistant", content: past.body });
+              } else {
+                pastinfo.push({ role: "user", content: past.body });
+              }
+            });
+          //  console.log(pastinfo);
             chat.sendStateTyping();
             try {
-              const result = await gptResponse(prompt);
+              const result = await gptResponse(pastinfo);
               msg.reply(result);
               chat.clearState();
             } catch (error) {
@@ -96,14 +101,13 @@ bot();
 
 async function gptResponse(prompt) {
   try {
-    const res = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: prompt,
-      max_tokens: 200,
+    const completion = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: prompt,
     });
-    return res.data.choices[0].text;
+    return completion.data.choices[0].message.content;
   } catch (err) {
-    console.error(err.response.text);
+    console.error(err);
     return "AI is unavailable";
   }
 }
