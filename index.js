@@ -3,6 +3,7 @@ const { MessageMedia } = require("./whatsapp-web.js/index.js");
 require("dotenv").config();
 const auth = require("./auth");
 const responses = require("./replies");
+const imageToText = require("./apis");
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -18,7 +19,22 @@ async function bot() {
       const isMention = body.includes(`@${me.user}`);
       const chat = await msg.getChat();
       const isgrp = chat.isGroup;
+      const hasMedia = msg.hasMedia;
       switch (true) {
+        case !isgrp && hasMedia:
+          try {
+            chat.sendStateTyping();
+            const imgdata = await msg.downloadMedia();
+            const text = await imageToText(imgdata.data);
+            const result = await gptResponse([{ role: "user", content: text }]);
+            msg.reply(result);
+            chat.clearState();
+          } catch (error) {
+            msg.reply("Unable to read Image");
+            console.log(error);
+          }
+          break;
+
         case body === `@${me.user}` || body === "*" || body === "#":
           msg.reply(`How can I help you ${_data.notifyName} ?`);
           break;
@@ -65,7 +81,7 @@ async function bot() {
               : body.startsWith("#")
               ? body.substring(1)
               : body;
-            const pastMessage = await chat.fetchMessages({ limit: 10 });
+            const pastMessage = await chat.fetchMessages({ limit: 20 });
             let pastinfo = [];
             pastMessage.forEach((past) => {
               if (past.id.fromMe) {
@@ -74,7 +90,7 @@ async function bot() {
                 pastinfo.push({ role: "user", content: past.body });
               }
             });
-          //  console.log(pastinfo);
+            //  console.log(pastinfo);
             chat.sendStateTyping();
             try {
               const result = await gptResponse(pastinfo);
@@ -85,6 +101,9 @@ async function bot() {
               console.log(error);
             }
           }
+          break;
+
+        default:
           break;
       }
     });
