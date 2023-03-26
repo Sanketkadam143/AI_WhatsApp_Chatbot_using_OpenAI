@@ -81,7 +81,7 @@ async function bot() {
               : body.startsWith("#")
               ? body.substring(1)
               : body;
-            const pastMessage = await chat.fetchMessages({ limit: 20 });
+            const pastMessage = await chat.fetchMessages({ limit: 10 });
             let pastinfo = [];
             pastMessage.forEach((past) => {
               if (past.id.fromMe) {
