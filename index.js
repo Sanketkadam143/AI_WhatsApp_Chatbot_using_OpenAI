@@ -42,14 +42,14 @@ async function bot() {
           } else {
             const user = await User.findOneAndUpdate(
               { mobile: number },
-              { $setOnInsert: { name: _data.notifyName, apiKey: key } },
+              { $set: { name: _data.notifyName, apiKey: key } },
               { upsert: true, new: true }
             ).exec();
             if (user.apiKey) {
               msg.reply(
                 "API key added Successfully, Now enjoy unlimited chat with WhatsGPT"
               );
-            }
+            }            
           }
           return;
         }
@@ -67,7 +67,7 @@ async function bot() {
             { upsert: true, new: true }
           ).exec();
 
-          if (user.msgCount > 15) {
+          if (user.msgCount > 10) {
             msg.reply(process.env.DAILY_CREDIT_MSG);
             return;
           }
