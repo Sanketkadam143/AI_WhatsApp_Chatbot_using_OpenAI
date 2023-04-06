@@ -57,10 +57,10 @@ async function bot() {
           { mobile: number },
           { apiKey: 1, _id: 0 }
         );
-        apiKey = isKeyPresent.apiKey
+        apiKey = isKeyPresent?.apiKey
           ? isKeyPresent.apiKey
           : process.env.OPENAI_API_KEY;
-        if (!isKeyPresent.apiKey) {
+        if (!isKeyPresent?.apiKey) {
           const user = await User.findOneAndUpdate(
             { mobile: number },
             { $inc: { msgCount: 1 }, $setOnInsert: { name: _data.notifyName } },

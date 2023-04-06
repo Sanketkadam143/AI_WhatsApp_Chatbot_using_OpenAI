@@ -1,9 +1,6 @@
 const request = require("request");
 require("dotenv").config();
 
-
-
-
 async function gptResponse(prompt,openai) {
   try {
     const completion = await openai.createChatCompletion({
