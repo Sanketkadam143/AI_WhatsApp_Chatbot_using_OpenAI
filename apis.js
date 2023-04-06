@@ -1,6 +1,37 @@
 const request = require("request");
 require("dotenv").config();
 
+
+
+
+async function gptResponse(prompt,openai) {
+  try {
+    const completion = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: prompt,
+    });
+    return completion.data.choices[0].message.content;
+  } catch (err) {
+    console.error(err);
+    return "AI is unavailable";
+  }
+}
+
+async function dalleResponse(prompt,openai) {
+  try {
+    const response = await openai.createImage({
+      prompt: prompt,
+      n: 1,
+      size: "256x256",
+    });
+    return (image_url = response.data.data[0].url);
+  } catch (error) {
+    console.error(error.response.statusText);
+    return error.response.status;
+  }
+}
+
+
 function imageToText(base64) {
   return new Promise((resolve, reject) => {
     try {
@@ -50,4 +81,4 @@ function imageToText(base64) {
   });
 }
 
-module.exports = imageToText;
+module.exports = {imageToText,dalleResponse,gptResponse};

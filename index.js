@@ -1,14 +1,11 @@
+//const { MessageMedia } = require("./whatsapp-web.js/index.js");
+const { MessageMedia } = require("whatsapp-web.js");
 const { Configuration, OpenAIApi } = require("openai");
-const { MessageMedia } = require("./whatsapp-web.js/index.js");
 require("dotenv").config();
 const auth = require("./auth");
 const responses = require("./replies");
-const imageToText = require("./apis");
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
+const { imageToText, dalleResponse, gptResponse } = require("./apis");
+const User = require("./models.js");
 
 async function bot() {
   try {
@@ -20,6 +17,70 @@ async function bot() {
       const chat = await msg.getChat();
       const isgrp = chat.isGroup;
       const hasMedia = msg.hasMedia;
+      const number = isgrp ? _data.author : _data.from;
+      let apiKey = process.env.OPENAI_API_KEY;
+
+      if (
+        body.startsWith("#") ||
+        isMention ||
+        !isgrp ||
+        (body.startsWith("*") && !body.substring(1).includes("*"))
+      ) {
+        const prefix = "#CONFIGURE_API=";
+        if (body.startsWith(prefix)) {
+          chat.sendStateTyping();
+          const key = body.substring(prefix.length);
+          const configuration = new Configuration({
+            apiKey: key,
+          });
+          const openai = new OpenAIApi(configuration);
+          const prompt = [{ role: "user", content: "testing api" }];
+          const res = await gptResponse(prompt, openai);
+          if (res === "AI is unavailable") {
+            msg.reply("Invalid key");
+            return;
+          } else {
+            const user = await User.findOneAndUpdate(
+              { mobile: number },
+              { $setOnInsert: { name: _data.notifyName, apiKey: key } },
+              { upsert: true, new: true }
+            ).exec();
+            if (user.apiKey) {
+              msg.reply(
+                "API key added Successfully, Now enjoy unlimited chat with WhatsGPT"
+              );
+            }
+          }
+          return;
+        }
+        const isKeyPresent = await User.findOne(
+          { mobile: number },
+          { apiKey: 1, _id: 0 }
+        );
+        apiKey = isKeyPresent.apiKey
+          ? isKeyPresent.apiKey
+          : process.env.OPENAI_API_KEY;
+        if (!isKeyPresent.apiKey) {
+          const user = await User.findOneAndUpdate(
+            { mobile: number },
+            { $inc: { msgCount: 1 }, $setOnInsert: { name: _data.notifyName } },
+            { upsert: true, new: true }
+          ).exec();
+
+          if (user.msgCount > 15) {
+            msg.reply(process.env.DAILY_CREDIT_MSG);
+            return;
+          }
+        }
+      } else {
+        return;
+      }
+
+      const configuration = new Configuration({
+        apiKey: apiKey,
+      });
+      const openai = new OpenAIApi(configuration);
+      
       switch (true) {
         case !isgrp && hasMedia:
           try {
@@ -47,7 +108,7 @@ async function bot() {
             const prompt = body.substring(1);
             chat.sendStateTyping();
             try {
-              const imgurl = await dalleResponse(prompt);
+              const imgurl = await dalleResponse(prompt, openai);
               if (imgurl == 400 || imgurl == 429) {
                 msg.reply(
                   "Your request was rejected as a result of our safety system. Your prompt may contain text that is not allowed by our safety system."
@@ -90,10 +151,10 @@ async function bot() {
                 pastinfo.push({ role: "user", content: past.body });
               }
             });
-            //  console.log(pastinfo);
             chat.sendStateTyping();
             try {
-              const result = await gptResponse(pastinfo);
+              const prompt = pastinfo;
+              const result = await gptResponse(prompt, openai);
               msg.reply(result);
               chat.clearState();
             } catch (error) {
@@ -117,30 +178,3 @@ async function bot() {
   }
 }
 bot();
-
-async function gptResponse(prompt) {
-  try {
-    const completion = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      messages: prompt,
-    });
-    return completion.data.choices[0].message.content;
-  } catch (err) {
-    console.error(err);
-    return "AI is unavailable";
-  }
-}
-
-async function dalleResponse(prompt) {
-  try {
-    const response = await openai.createImage({
-      prompt: prompt,
-      n: 1,
-      size: "256x256",
-    });
-    return (image_url = response.data.data[0].url);
-  } catch (error) {
-    console.error(error.response.statusText);
-    return error.response.status;
-  }
-}
