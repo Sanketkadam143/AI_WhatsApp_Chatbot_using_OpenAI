@@ -63,11 +63,11 @@ async function bot() {
         if (!isKeyPresent?.apiKey) {
           const user = await User.findOneAndUpdate(
             { mobile: number },
-            { $inc: { msgCount: 1 }, $setOnInsert: { name: _data.notifyName } },
+            { $inc: { msgCount: 1 }, $set: { name: _data.notifyName } },
             { upsert: true, new: true }
           ).exec();
 
-          if (user.msgCount > 10) {
+          if (user.msgCount > 5) {
             msg.reply(process.env.DAILY_CREDIT_MSG);
             return;
           }
