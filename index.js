@@ -35,9 +35,9 @@ async function bot() {
           });
           const openai = new OpenAIApi(configuration);
           const prompt = [{ role: "user", content: "testing api" }];
-          const res = await gptResponse(prompt, openai);
-          if (res === "AI is unavailable") {
-            msg.reply("Invalid key");
+          const res = await gptResponse(prompt, openai,type="testing");
+          if (res ==="Invalid") {
+            msg.reply("Invalid key or It might have expired..check usage section in openai");
             return;
           } else {
             const user = await User.findOneAndUpdate(
@@ -87,7 +87,8 @@ async function bot() {
             chat.sendStateTyping();
             const imgdata = await msg.downloadMedia();
             const text = await imageToText(imgdata.data);
-            const result = await gptResponse([{ role: "user", content: text }]);
+            const prompt=[{ role: "user", content: text }];
+            const result = await gptResponse(prompt,openai);
             msg.reply(result);
             chat.clearState();
           } catch (error) {

@@ -1,7 +1,7 @@
 const request = require("request");
 require("dotenv").config();
 
-async function gptResponse(prompt,openai) {
+async function gptResponse(prompt,openai,type) {
   try {
     const completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
@@ -10,7 +10,10 @@ async function gptResponse(prompt,openai) {
     return completion.data.choices[0].message.content;
   } catch (err) {
     console.error(err);
-    return "AI is unavailable";
+    if(type==="testing"){
+      return "Invalid"
+    }
+    return err.response.statusText;
   }
 }
 
