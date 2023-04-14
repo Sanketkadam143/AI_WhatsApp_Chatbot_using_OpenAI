@@ -1,4 +1,3 @@
-//const { MessageMedia } = require("./whatsapp-web.js/index.js");
 const { MessageMedia } = require("whatsapp-web.js");
 const { Configuration, OpenAIApi } = require("openai");
 require("dotenv").config();
@@ -6,10 +5,25 @@ const auth = require("./auth");
 const responses = require("./replies");
 const { imageToText, dalleResponse, gptResponse } = require("./apis");
 const User = require("./models.js");
+const { addUser, customMessage } = require("./utils/index");
+const resetCredit = require("./utils/cronJob.js");
+
+const apiKeyCount = 4;
+const apiKeys = [];
+
+for (let i = 1; i <= apiKeyCount; i++) {
+  const apiKey = process.env[`OPENAI_API_KEY_${i}`];
+  if (apiKey) {
+    apiKeys.push(apiKey);
+  }
+}
 
 async function bot() {
   try {
     const client = await auth();
+    resetCredit(client);
+    await addUser(client);
+    // await customMessage(client);
     client.on("message", async (msg) => {
       const { body, _data } = msg;
       const { me } = client.info;
@@ -18,7 +32,8 @@ async function bot() {
       const isgrp = chat.isGroup;
       const hasMedia = msg.hasMedia;
       const number = isgrp ? _data.author : _data.from;
-      let apiKey = process.env.OPENAI_API_KEY;
+      const apiKeyIndex = Math.floor(Math.random() * apiKeys.length);
+      let apiKey = apiKeys[apiKeyIndex];
 
       if (
         body.startsWith("#") ||
@@ -35,9 +50,11 @@ async function bot() {
           });
           const openai = new OpenAIApi(configuration);
           const prompt = [{ role: "user", content: "testing api" }];
-          const res = await gptResponse(prompt, openai,type="testing");
-          if (res ==="Invalid") {
-            msg.reply("Invalid key or It might have expired..check usage section in openai");
+          const res = await gptResponse(prompt, openai, (type = "testing"));
+          if (res === "Invalid") {
+            msg.reply(
+              "Invalid key or It might have expired..check usage section in openai"
+            );
             return;
           } else {
             const user = await User.findOneAndUpdate(
@@ -49,7 +66,7 @@ async function bot() {
               msg.reply(
                 "API key added Successfully, Now enjoy unlimited chat with WhatsGPT"
               );
-            }            
+            }
           }
           return;
         }
@@ -57,9 +74,7 @@ async function bot() {
           { mobile: number },
           { apiKey: 1, _id: 0 }
         );
-        apiKey = isKeyPresent?.apiKey
-          ? isKeyPresent.apiKey
-          : process.env.OPENAI_API_KEY;
+        apiKey = isKeyPresent?.apiKey ? isKeyPresent.apiKey : apiKey;
         if (!isKeyPresent?.apiKey) {
           const user = await User.findOneAndUpdate(
             { mobile: number },
@@ -67,7 +82,7 @@ async function bot() {
             { upsert: true, new: true }
           ).exec();
 
-          if (user.msgCount > 5) {
+          if (user.msgCount > process.env.MSG_LIMIT) {
             msg.reply(process.env.DAILY_CREDIT_MSG);
             return;
           }
@@ -80,15 +95,15 @@ async function bot() {
         apiKey: apiKey,
       });
       const openai = new OpenAIApi(configuration);
-      
+
       switch (true) {
         case !isgrp && hasMedia:
           try {
             chat.sendStateTyping();
             const imgdata = await msg.downloadMedia();
             const text = await imageToText(imgdata.data);
-            const prompt=[{ role: "user", content: text }];
-            const result = await gptResponse(prompt,openai);
+            const prompt = [{ role: "user", content: text }];
+            const result = await gptResponse(prompt, openai);
             msg.reply(result);
             chat.clearState();
           } catch (error) {

@@ -1,5 +1,4 @@
 const mongoose=require("mongoose");
-const cron=require("node-cron");
 
 const userSchema = mongoose.Schema({
   name: { type: String, required: true },
@@ -9,16 +8,5 @@ const userSchema = mongoose.Schema({
 });
 
 const WhatsGPTUser = mongoose.model("WhatsGPTUser", userSchema);
-
-// Schedule a job to reset the msgCount field every midnight
-cron.schedule("30 18 * * *", async () => {
-  try {
-    const result = await WhatsGPTUser.updateMany({}, { $set: { msgCount: 0 } });
-    console.log(`All users message count reset to zero`);
-  } catch (error) {
-    console.error("Error resetting msgCount:", error);
-  }
-});
-
 
 module.exports=WhatsGPTUser;
