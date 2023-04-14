@@ -22,7 +22,7 @@ async function bot() {
   try {
     const client = await auth();
     resetCredit(client);
-    await addUser(client);
+    // await addUser(client);
     // await customMessage(client);
     client.on("message", async (msg) => {
       const { body, _data } = msg;
@@ -158,9 +158,12 @@ async function bot() {
               : body.startsWith("#")
               ? body.substring(1)
               : body;
-            const pastMessage = await chat.fetchMessages({ limit: 10 });
+            const pastMessages = await chat.fetchMessages({ limit: 10 });
+            const filteredMessages = pastMessages.filter(
+              (msg) => !msg.hasMedia
+            );
             let pastinfo = [];
-            pastMessage.forEach((past) => {
+            filteredMessages.forEach((past) => {
               if (past.id.fromMe) {
                 pastinfo.push({ role: "assistant", content: past.body });
               } else {
