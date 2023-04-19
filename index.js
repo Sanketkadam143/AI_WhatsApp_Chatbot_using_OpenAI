@@ -3,7 +3,12 @@ const { Configuration, OpenAIApi } = require("openai");
 require("dotenv").config();
 const auth = require("./auth");
 const responses = require("./replies");
-const { imageToText, dalleResponse, gptResponse } = require("./apis");
+const {
+  imageToText,
+  dalleResponse,
+  gptResponse,
+  speechToText,
+} = require("./apis");
 const User = require("./models.js");
 const { addUser, customMessage } = require("./utils/index");
 const resetCredit = require("./utils/cronJob.js");
@@ -34,7 +39,7 @@ async function bot() {
       const number = isgrp ? _data.author : _data.from;
       const apiKeyIndex = Math.floor(Math.random() * apiKeys.length);
       let apiKey = apiKeys[apiKeyIndex];
-
+      const type = msg.type;
       if (
         body.startsWith("#") ||
         isMention ||
@@ -50,7 +55,7 @@ async function bot() {
           });
           const openai = new OpenAIApi(configuration);
           const prompt = [{ role: "user", content: "testing api" }];
-          const res = await gptResponse(prompt, openai, (type = "testing"));
+          const res = await gptResponse(prompt, openai, type === "testing");
           if (res === "Invalid") {
             msg.reply(
               "Invalid key or It might have expired..check usage section in openai"
@@ -97,6 +102,18 @@ async function bot() {
       const openai = new OpenAIApi(configuration);
 
       switch (true) {
+        case (!isgrp && hasMedia && type === "audio") || type === "ptt":
+          try {
+            chat.sendStateTyping();
+            const audioData = await msg.downloadMedia();
+            msg.reply("feature under development");
+            // console.log(audioData)
+            // const text = await speechToText(audioData, openai);
+          } catch (error) {
+            console.log(error);
+          }
+          break;
+
         case !isgrp && hasMedia:
           try {
             chat.sendStateTyping();
@@ -149,9 +166,11 @@ async function bot() {
           if (index >= 0) {
             msg.reply(responses[index].ans);
           } else if (body.length < 10) {
-            msg.reply(
-              `Hey ${_data.notifyName} please be more brief to generate accurate response.`
-            );
+            if (_data.notifyName) {
+              msg.reply(
+                `Hey ${_data.notifyName} please be more brief to generate accurate response.`
+              );
+            }
           } else {
             const prompt = isMention
               ? body.substring(me.user.length + 1)

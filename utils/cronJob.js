@@ -9,12 +9,12 @@ module.exports = (client) => {
       const usersToUpdate = await User.find({ msgCount: { $gt: limit } });
 
       const result = await User.updateMany({}, { $set: { msgCount: 0 } });
-      if (result.modifiedCount > 0) {
-        await renewalMsg(usersToUpdate, client);
-        console.log(`Updated ${result.modifiedCount} users: ${result}`);
-      } else {
-        console.log(`No users to update`);
-      }
+      // if (result.modifiedCount > 0) {
+      //   await renewalMsg(usersToUpdate, client);
+      //   console.log(`Updated ${result.modifiedCount} users: ${result}`);
+      // } else {
+      //   console.log(`No users to update`);
+      // }
     } catch (error) {
       console.error("Error resetting msgCount:", error);
     }

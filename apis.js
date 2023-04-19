@@ -1,7 +1,7 @@
 const request = require("request");
 require("dotenv").config();
 
-async function gptResponse(prompt,openai,type) {
+async function gptResponse(prompt, openai, type) {
   try {
     const completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
@@ -10,14 +10,33 @@ async function gptResponse(prompt,openai,type) {
     return completion.data.choices[0].message.content;
   } catch (err) {
     console.error(err);
-    if(type==="testing"){
-      return "Invalid"
+    if (type === "testing") {
+      return "Invalid";
     }
     return err.response.statusText;
   }
 }
 
-async function dalleResponse(prompt,openai) {
+async function speechToText(audioData, openai) {
+  try {
+    const audioBuffer = Buffer.from(audioData.data, "base64");
+
+    const response = await openai.createTranscription(
+      audioBuffer, // The audio file to transcribe.
+      "whisper-1", // The model to use for transcription.
+      "json", // The format of the transcription.
+      "en", // Language
+      1 // Temperature
+    );
+    
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function dalleResponse(prompt, openai) {
   try {
     const response = await openai.createImage({
       prompt: prompt,
@@ -31,14 +50,13 @@ async function dalleResponse(prompt,openai) {
   }
 }
 
-
 function imageToText(base64) {
   return new Promise((resolve, reject) => {
     try {
       const url = "https://api.api-ninjas.com/v1/imagetotext";
       const apiKey = process.env.IMAGE_TO_TEXT_API;
 
-      const buffer = Buffer.from(base64, 'base64');
+      const buffer = Buffer.from(base64, "base64");
 
       const formData = {
         image: {
@@ -81,4 +99,4 @@ function imageToText(base64) {
   });
 }
 
-module.exports = {imageToText,dalleResponse,gptResponse};
+module.exports = { imageToText, dalleResponse, gptResponse, speechToText };
