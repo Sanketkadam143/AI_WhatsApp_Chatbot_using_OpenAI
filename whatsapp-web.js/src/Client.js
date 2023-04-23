@@ -225,11 +225,11 @@ class Client extends EventEmitter {
                 const obs = new MutationObserver((muts) => {
                     muts.forEach(mut => {
                         // Listens to qr token change
-                        if (mut?.type === 'attributes' && mut.attributeName === 'data-ref') {
+                        if (mut.type === 'attributes' && mut.attributeName === 'data-ref') {
                             window.qrChanged(mut.target.dataset.ref);
                         } else
                         // Listens to retry button, when found, click it
-                        if (mut?.type === 'childList') {
+                        if (mut.type === 'childList') {
                             const retry_button = document.querySelector(selectors.QR_RETRY_BUTTON);
                             if (retry_button) retry_button.click();
                         }
@@ -301,7 +301,7 @@ class Client extends EventEmitter {
 
         // Register events
         await page.exposeFunction('onAddMessageEvent', msg => {
-            if (msg?.type === 'gp2') {
+            if (msg.type === 'gp2') {
                 const notification = new GroupNotification(this, msg);
                 if (msg.subtype === 'add' || msg.subtype === 'invite') {
                     /**
@@ -351,7 +351,7 @@ class Client extends EventEmitter {
 
         await page.exposeFunction('onChangeMessageTypeEvent', (msg) => {
 
-            if (msg?.type === 'revoked') {
+            if (msg.type === 'revoked') {
                 const message = new Message(this, msg);
                 let revoked_msg;
                 if (last_message && msg.id.id === last_message.id.id) {
@@ -372,7 +372,7 @@ class Client extends EventEmitter {
 
         await page.exposeFunction('onChangeMessageEvent', (msg) => {
 
-            if (msg?.type !== 'revoked') {
+            if (msg.type !== 'revoked') {
                 last_message = msg;
             }
 
@@ -518,7 +518,7 @@ class Client extends EventEmitter {
             window.Store.Call.on('add', (call) => { window.onIncomingCall(call); });
             window.Store.Msg.on('add', (msg) => { 
                 if (msg.isNewMsg) {
-                    if(msg?.type === 'ciphertext') {
+                    if(msg.type === 'ciphertext') {
                         // defer message event until ciphertext is resolved (type changed)
                         msg.once('change:type', (_msg) => window.onAddMessageEvent(window.WWebJS.getMessageModel(_msg)));
                     } else {
@@ -640,7 +640,7 @@ class Client extends EventEmitter {
             sendMediaAsSticker: options.sendMediaAsSticker,
             sendMediaAsDocument: options.sendMediaAsDocument,
             caption: options.caption,
-            quotedMessageId: options.quotedMessageId,
+            quotedMessageId: options?.quotedMessageId,
             parseVCards: options.parseVCards === false ? false : true,
             mentionedJidList: Array.isArray(options.mentions) ? options.mentions.map(contact => contact.id._serialized) : [],
             extraOptions: options.extra
@@ -665,7 +665,7 @@ class Client extends EventEmitter {
             internalOptions.contactCardList = content.map(contact => contact.id._serialized);
             content = '';
         } else if (content instanceof Buttons) {
-            if (content?.type !== 'chat') { internalOptions.attachment = content.body; }
+            if (content.type !== 'chat') { internalOptions.attachment = content.body; }
             internalOptions.buttons = content;
             content = '';
         } else if (content instanceof List) {
@@ -684,20 +684,16 @@ class Client extends EventEmitter {
         }
 
         const newMessage = await this.pupPage.evaluate(async (chatId, message, options, sendSeen) => {
-            try {
-                const chatWid = window.Store.WidFactory.createWid(chatId);
-                const chat = await window.Store.Chat.find(chatWid);
+            const chatWid = window.Store.WidFactory.createWid(chatId);
+            const chat = await window.Store.Chat.find(chatWid);
 
 
-                if (sendSeen) {
-                    window.WWebJS.sendSeen(chatId);
-                }
-
-                const msg = await window.WWebJS.sendMessage(chat, message, options, sendSeen);
-                return msg.serialize();
-            } catch (e) {
-                console.log("Error newMessage", e);
+            if (sendSeen) {
+                window.WWebJS.sendSeen(chatId);
             }
+
+            const msg = await window.WWebJS.sendMessage(chat, message, options, sendSeen);
+            return msg.serialize();
         }, chatId, content, internalOptions, sendSeen);
 
         return new Message(this, newMessage);
@@ -941,7 +937,7 @@ class Client extends EventEmitter {
         unmuteDate = unmuteDate ? unmuteDate.getTime() / 1000 : -1;
         await this.pupPage.evaluate(async (chatId, timestamp) => {
             let chat = await window.Store.Chat.get(chatId);
-            await chat.mute.mute(timestamp, !0);
+            await chat.mute.mute({expiration: timestamp, sendDevice:!0});
         }, chatId, unmuteDate || -1);
     }
 

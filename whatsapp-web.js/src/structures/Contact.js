@@ -69,7 +69,7 @@ class Contact extends Base {
         this.shortName = data.shortName;
 
         this.statusMute = data.statusMute;
-        this.type = data?.type;
+        this.type = data.type;
         this.verifiedLevel = data.verifiedLevel;
         this.verifiedName = data.verifiedName;
 

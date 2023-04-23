@@ -17,7 +17,7 @@ exports.ExposeStore = (moduleRaidStr) => {
     window.Store.Invite = window.mR.findModule('resetGroupInviteCode')[0];
     window.Store.InviteInfo = window.mR.findModule('queryGroupInvite')[0];
     window.Store.Label = window.mR.findModule('LabelCollection')[0].LabelCollection;
-    window.Store.MediaPrep = window.mR.findModule('MediaPrep')[0];
+    window.Store.MediaPrep = window.mR.findModule('prepRawMedia')[0];
     window.Store.MediaObject = window.mR.findModule('getOrCreateMediaObject')[0];
     window.Store.NumberInfo = window.mR.findModule('formattedPhoneNumber')[0];
     window.Store.MediaTypes = window.mR.findModule('msgToMediaType')[0];
@@ -25,7 +25,7 @@ exports.ExposeStore = (moduleRaidStr) => {
     window.Store.MsgKey = window.mR.findModule((module) => module.default && module.default.fromString)[0].default;
     window.Store.MessageInfo = window.mR.findModule('sendQueryMsgInfo')[0];
     window.Store.OpaqueData = window.mR.findModule(module => module.default && module.default.createFromData)[0].default;
-    window.Store.QueryExist = window.mR.findModule('queryExists')[0]?.queryExists;
+    window.Store.QueryExist = window.mR.findModule('queryExists')[0] ? window.mR.findModule('queryExists')[0].queryExists : window.mR.findModule('queryExist')[0].queryWidExists;
     window.Store.QueryProduct = window.mR.findModule('queryProduct')[0];
     window.Store.QueryOrder = window.mR.findModule('queryOrder')[0];
     window.Store.SendClear = window.mR.findModule('sendClear')[0];
@@ -128,8 +128,8 @@ exports.LoadUtils = () => {
 
             // TODO remove .canReply() once all clients are updated to >= v2.2241.6
             const canReply = window.Store.ReplyUtils ? 
-                window.Store.ReplyUtils?.canReplyMsg(quotedMessage?.unsafe()) : 
-                quotedMessage?.canReply();
+                window.Store.ReplyUtils.canReplyMsg(quotedMessage?.unsafe()) : 
+                quotedMessage.canReply();
 
             if (canReply) {
                 quotedMsgOptions = quotedMessage.msgContextInfo(chat);
@@ -203,7 +203,7 @@ exports.LoadUtils = () => {
         let buttonOptions = {};
         if(options.buttons){
             let caption;
-            if (options.buttons?.type === 'chat') {
+            if (options.buttons.type === 'chat') {
                 content = options.buttons.body;
                 caption = content;
             } else {
@@ -332,7 +332,7 @@ exports.LoadUtils = () => {
         const mediaObject = window.Store.MediaObject.getOrCreateMediaObject(mediaData.filehash);
 
         const mediaType = window.Store.MediaTypes.msgToMediaType({
-            type: mediaData?.type,
+            type: mediaData.type,
             isGif: mediaData.isGif
         });
 

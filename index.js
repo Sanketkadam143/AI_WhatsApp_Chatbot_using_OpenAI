@@ -1,4 +1,4 @@
-const { MessageMedia } = require("whatsapp-web.js");
+const { MessageMedia } = require("./whatsapp-web.js/index.js");
 const { Configuration, OpenAIApi } = require("openai");
 require("dotenv").config();
 const auth = require("./auth");
@@ -102,13 +102,15 @@ async function bot() {
       const openai = new OpenAIApi(configuration);
 
       switch (true) {
-        case (!isgrp && hasMedia && type === "audio") || type === "ptt":
+        case !isgrp && hasMedia && (type === "audio" || type === "ptt"):
           try {
             chat.sendStateTyping();
             const audioData = await msg.downloadMedia();
-            msg.reply("feature under development");
-            // console.log(audioData)
-            // const text = await speechToText(audioData, openai);
+            const text = await speechToText(audioData, openai, number);
+            const prompt = [{ role: "user", content: text }];
+            const result = await gptResponse(prompt, openai);
+            msg.reply(result);
+            chat.clearState();
           } catch (error) {
             console.log(error);
           }

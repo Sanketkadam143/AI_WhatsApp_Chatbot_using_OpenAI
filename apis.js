@@ -1,5 +1,10 @@
 const request = require("request");
+const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
+const ffmpeg = require("fluent-ffmpeg");
+ffmpeg.setFfmpegPath(ffmpegPath);
+const { Readable } = require("stream");
 require("dotenv").config();
+const fs = require("fs");
 
 async function gptResponse(prompt, openai, type) {
   try {
@@ -17,22 +22,46 @@ async function gptResponse(prompt, openai, type) {
   }
 }
 
-async function speechToText(audioData, openai) {
+function bufferToStream(binary) {
+  const stream = new Readable();
+  stream.push(binary);
+  stream.push(null);
+  return stream;
+}
+
+async function speechToText(audioData, openai, number) {
   try {
     const audioBuffer = Buffer.from(audioData.data, "base64");
+    const filename = `./audio/${number}.mp3`;
+    const inputStream = bufferToStream(audioBuffer);
+    await new Promise((resolve, reject) => {
+      ffmpeg()
+        .input(inputStream)
+        .noVideo()
+        .audioCodec("libmp3lame")
+        .audioBitrate("128k")
+        .output(filename)
+        .outputFormat("mp3")
+        .outputOptions("-f mp3")
+        .on("error", function (err) {
+          console.log("An error occurred: " + err.message);
+          reject(err);
+        })
+        .on("end", function () {
+          console.log("Audio conversion complete.");
+          resolve();
+        })
+        .run();
+    });
 
     const response = await openai.createTranscription(
-      audioBuffer, // The audio file to transcribe.
-      "whisper-1", // The model to use for transcription.
-      "json", // The format of the transcription.
-      "en", // Language
-      1 // Temperature
+      fs.createReadStream(filename),
+      "whisper-1",
+       "en" //Language
     );
-    
-    console.log(response);
-    return response;
+    return response.data.text;
   } catch (error) {
-    console.log(error);
+    console.log(error.response.status);
   }
 }
 
