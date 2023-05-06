@@ -4,6 +4,11 @@ FROM node:18.7.0-slim
 # Set the working directory
 WORKDIR /app
 
+# Install ffmpeg
+RUN apt-get update \
+    && apt-get install -y ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy the package.json and package-lock.json files
 COPY package*.json ./
 
