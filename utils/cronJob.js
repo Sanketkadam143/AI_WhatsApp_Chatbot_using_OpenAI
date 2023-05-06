@@ -17,18 +17,6 @@ module.exports = (client) => {
       //   console.log(`No users to update`);
       // }
 
-        // Delete all files in ./audio folder
-        const directory = './audio';
-        fs.readdir(directory, (err, files) => {
-          if (err) throw err;
-  
-          for (const file of files) {
-            fs.unlink(`${directory}/${file}`, (err) => {
-              if (err) throw err;
-            });
-          }
-        });
-
     } catch (error) {
       console.error("Error resetting msgCount:", error);
     }

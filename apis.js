@@ -57,9 +57,18 @@ async function speechToText(audioData, openai, number) {
     const response = await openai.createTranscription(
       fs.createReadStream(filename),
       "whisper-1",
-       "en" //Language
+      "en" //Language
     );
-    return response.data.text;
+    const transcription = response.data.text;
+
+    fs.unlink(filename, (err) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+    });
+
+    return transcription;
   } catch (error) {
     console.log(error.response.status);
   }
