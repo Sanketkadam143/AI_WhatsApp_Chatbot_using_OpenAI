@@ -13,7 +13,7 @@ const User = require("./models.js");
 const { addUser, customMessage } = require("./utils/index");
 const resetCredit = require("./utils/cronJob.js");
 
-const apiKeyCount = 4;
+const apiKeyCount = 2;
 const apiKeys = [];
 
 for (let i = 1; i <= apiKeyCount; i++) {
@@ -55,7 +55,7 @@ async function bot() {
           });
           const openai = new OpenAIApi(configuration);
           const prompt = [{ role: "user", content: "testing api" }];
-          const res = await gptResponse(prompt, openai, type === "testing");
+          const res = await gptResponse(prompt, openai,"testing");
           if (res === "Invalid") {
             msg.reply(
               "Invalid key or It might have expired..check usage section in openai"
