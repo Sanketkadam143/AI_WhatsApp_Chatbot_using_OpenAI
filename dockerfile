@@ -5,9 +5,9 @@ FROM node:18.7.0
 WORKDIR /app
 
 # Install ffmpeg
-RUN apt-get update \
-    && apt-get install -y ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y
+RUN apt-get upgrade -y
+RUN apt-get install ffmpeg -y
 
 # Copy the package.json and package-lock.json files
 COPY package*.json ./
