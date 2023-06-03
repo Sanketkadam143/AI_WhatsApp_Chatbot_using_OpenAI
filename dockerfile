@@ -8,6 +8,8 @@ WORKDIR /app
 RUN apt-get update -y
 RUN apt-get upgrade -y
 RUN apt-get install ffmpeg -y
+RUN apt-get @ffmpeg-installer/ffmpeg
+RUN apt-get fluent-ffmpeg
 
 # Copy the package.json and package-lock.json files
 COPY package*.json ./
