@@ -81,6 +81,8 @@ async function bot() {
         );
         apiKey = isKeyPresent?.apiKey ? isKeyPresent.apiKey : apiKey;
         if (!isKeyPresent?.apiKey) {
+          msg.reply(process.env.ADD_KEY_MSG);
+          return
           const user = await User.findOneAndUpdate(
             { mobile: number },
             { $inc: { msgCount: 1 }, $set: { name: _data.notifyName } },
