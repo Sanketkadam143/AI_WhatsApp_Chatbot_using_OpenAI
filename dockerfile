@@ -5,17 +5,15 @@ FROM node:18.7.0
 WORKDIR /app
 
 # Install ffmpeg
-RUN apt-get update -y
-RUN apt-get upgrade -y
-RUN apt-get install ffmpeg -y
-RUN apt-get @ffmpeg-installer/ffmpeg
-RUN apt-get fluent-ffmpeg
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get install ffmpeg -y
 
 # Copy the package.json and package-lock.json files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install only dependencies, excluding devDependencies
+RUN npm ci --only=production
 
 # Copy the .env file
 COPY .env ./
