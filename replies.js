@@ -15,4 +15,4 @@ const responses = [
   { que: "hi", ans: "Hello!,How can i help you? " },
 ];
 
-module.exports = responses;
+export default responses;

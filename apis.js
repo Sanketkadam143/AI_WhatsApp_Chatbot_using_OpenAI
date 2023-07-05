@@ -1,12 +1,14 @@
-const request = require("request");
-const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
-const ffmpeg = require("fluent-ffmpeg");
-ffmpeg.setFfmpegPath(ffmpegPath);
-const { Readable } = require("stream");
-require("dotenv").config();
-const fs = require("fs");
+import request from "request";
+import ffmpegPath from "@ffmpeg-installer/ffmpeg";
+import ffmpeg from "fluent-ffmpeg";
+import { Readable } from "stream";
+import dotenv from "dotenv";
+import fs from "fs";
+dotenv.config();
+const { path: ffmpegExecutable } = ffmpegPath;
+ffmpeg.setFfmpegPath(ffmpegExecutable);
 
-async function gptResponse(prompt, openai, type) {
+export async function gptResponse(prompt, openai, type) {
   try {
     const completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
@@ -29,7 +31,7 @@ function bufferToStream(binary) {
   return stream;
 }
 
-async function speechToText(audioData, openai, number) {
+export async function speechToText(audioData, openai, number) {
   try {
     const audioBuffer = Buffer.from(audioData.data, "base64");
     const filename = `./audio/${number}.mp3`;
@@ -74,7 +76,7 @@ async function speechToText(audioData, openai, number) {
   }
 }
 
-async function dalleResponse(prompt, openai) {
+export async function dalleResponse(prompt, openai) {
   try {
     const response = await openai.createImage({
       prompt: prompt,
@@ -88,7 +90,7 @@ async function dalleResponse(prompt, openai) {
   }
 }
 
-function imageToText(base64) {
+export function imageToText(base64) {
   return new Promise((resolve, reject) => {
     try {
       const url = "https://api.api-ninjas.com/v1/imagetotext";
@@ -137,4 +139,4 @@ function imageToText(base64) {
   });
 }
 
-module.exports = { imageToText, dalleResponse, gptResponse, speechToText };
+

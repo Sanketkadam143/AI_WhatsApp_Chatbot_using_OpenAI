@@ -1,12 +1,12 @@
-const mongoose=require("mongoose");
+import { Schema, model } from "mongoose";
 
-const userSchema = mongoose.Schema({
+const userSchema = Schema({
   name: { type: String, required: true },
   mobile: { type: String, default: "" },
   msgCount: { type: Number, default: 0 },
   apiKey: { type: String, default: "" },
 });
 
-const WhatsGPTUser = mongoose.model("WhatsGPTUser", userSchema);
+const WhatsGPTUser = model("WhatsGPTUser", userSchema);
 
-module.exports=WhatsGPTUser;
+export default WhatsGPTUser;

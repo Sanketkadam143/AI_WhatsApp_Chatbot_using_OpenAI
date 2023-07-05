@@ -1,13 +1,13 @@
-const { Client, RemoteAuth } =require("./whatsapp-web.js/index.js");
-const qrcode = require("qrcode-terminal");
-
+import pkg from "./whatsapp-web.js/index.js";
+import qrcode from "qrcode-terminal";
 // Require database
-const { MongoStore } = require("wwebjs-mongo");
-const mongoose = require("mongoose");
+import { MongoStore } from "wwebjs-mongo";
+import mongoose from "mongoose";
+const { Client, RemoteAuth } = pkg;
 let client;
 
 // Load the session data
-function auth() {
+export default function auth() {
   return new Promise((resolve, reject) => {
     try {
       mongoose.set("strictQuery", false);
@@ -68,4 +68,4 @@ function auth() {
   });
 }
 
-module.exports = auth;
+

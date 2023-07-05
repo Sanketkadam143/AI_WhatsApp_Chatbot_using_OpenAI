@@ -1,6 +1,6 @@
-const User = require("../models.js");
+import User from "../models.js";
 
-async function addUser(client) {
+export async function addUser(client) {
   const operations = [];
   const chats = await client.getChats();
   console.log(chats.length)
@@ -32,7 +32,7 @@ async function addUser(client) {
   // await User.bulkWrite(operations);
 }
 
-async function customMessage(client) {
+export async function customMessage(client) {
   const batchSize = 1000;
   let offset = 0;
 
@@ -54,7 +54,7 @@ async function customMessage(client) {
   }
 }
 
-async function renewalMsg(usersToUpdate, client) {
+export async function renewalMsg(usersToUpdate, client) {
   const chatIds = usersToUpdate.map((user) => user.mobile);
   const content = process.env.RENEWAL_MSG;
 
@@ -63,4 +63,4 @@ async function renewalMsg(usersToUpdate, client) {
   );
 }
 
-module.exports = { addUser, customMessage, renewalMsg };
+

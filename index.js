@@ -1,28 +1,30 @@
-const { MessageMedia } = require("./whatsapp-web.js/index.js");
-const { Configuration, OpenAIApi } = require("openai");
-require("dotenv").config();
-const auth = require("./auth");
-const responses = require("./replies");
-const {
+import pkg from "./whatsapp-web.js/index.js";
+const { MessageMedia } = pkg;
+import { Configuration, OpenAIApi } from "openai";
+import { config } from "dotenv";
+import auth from "./auth.js";
+import responses from "./replies.js";
+import {
   imageToText,
   dalleResponse,
   gptResponse,
   speechToText,
-} = require("./apis");
-const User = require("./models.js");
-const { addUser, customMessage } = require("./utils/index");
-const resetCredit = require("./utils/cronJob.js");
+} from "./apis.js";
+import User from "./models.js";
+import { addUser, customMessage } from "./utils/index.js";
+import resetCredit from "./utils/cronJob.js";
+import createEmbeddings from "./custom_gpt/embeddings.js";
+import search from "./custom_gpt/docsearch.js";
+config();
 
 const apiKeyCount = 2;
 const apiKeys = [];
-
 for (let i = 1; i <= apiKeyCount; i++) {
   const apiKey = process.env[`OPENAI_API_KEY_${i}`];
   if (apiKey) {
     apiKeys.push(apiKey);
   }
 }
-
 async function bot() {
   try {
     const client = await auth();
@@ -40,6 +42,7 @@ async function bot() {
       const apiKeyIndex = Math.floor(Math.random() * apiKeys.length);
       let apiKey = apiKeys[apiKeyIndex];
       const type = msg.type;
+      console.log(msg);
       if (
         body.startsWith("#") ||
         isMention ||
@@ -55,7 +58,7 @@ async function bot() {
           });
           const openai = new OpenAIApi(configuration);
           const prompt = [{ role: "user", content: "testing api" }];
-          const res = await gptResponse(prompt, openai,"testing");
+          const res = await gptResponse(prompt, openai, "testing");
           if (res === "Invalid") {
             msg.reply(
               "Invalid key or It might have expired..check usage section in openai"
@@ -82,7 +85,7 @@ async function bot() {
         apiKey = isKeyPresent?.apiKey ? isKeyPresent.apiKey : apiKey;
         if (!isKeyPresent?.apiKey) {
           msg.reply(process.env.ADD_KEY_MSG);
-          return
+          return;
           const user = await User.findOneAndUpdate(
             { mobile: number },
             { $inc: { msgCount: 1 }, $set: { name: _data.notifyName } },
@@ -104,6 +107,21 @@ async function bot() {
       const openai = new OpenAIApi(configuration);
 
       switch (true) {
+        case !isgrp && hasMedia && type === "document":
+          try {
+            chat.sendStateTyping();
+            msg.reply("You will be notified once the embeddings are created");
+            const embed = await createEmbeddings(msg,number,apiKey);
+            if (embed) {
+              msg.reply("Embedding for the document created successfully");
+            } else {
+              return;
+            }
+          } catch (error) {
+            msg.reply("Unable to create embedding");
+            console.log(error);
+          }
+          break;
         case !isgrp && hasMedia && (type === "audio" || type === "ptt"):
           try {
             chat.sendStateTyping();
@@ -128,7 +146,7 @@ async function bot() {
             msg.reply(result);
             chat.clearState();
           } catch (error) {
-            msg.reply("Unable to read Image");
+            msg.reply("Unable to read file");
             console.log(error);
           }
           break;
@@ -175,7 +193,11 @@ async function bot() {
                 `Hey ${_data.notifyName} please be more brief to generate accurate response.`
               );
             }
-          } else {
+          } else if( body.startsWith("/")){
+            const trained_res = await search(number, body,apiKey);
+            msg.reply(trained_res);
+            return;
+          } else  {
             const prompt = isMention
               ? body.substring(me.user.length + 1)
               : body.startsWith("#")

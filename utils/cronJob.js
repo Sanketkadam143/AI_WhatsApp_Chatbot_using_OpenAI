@@ -1,10 +1,10 @@
-const cron = require("node-cron");
-const User = require("../models.js");
-const { renewalMsg } = require("./index.js");
-const fs = require("fs");
+import { schedule } from "node-cron";
+import User from "../models.js";
+import { renewalMsg } from "./index.js";
+import fs from "fs";
 
-module.exports = (client) => {
-  cron.schedule("30 18 * * *", async () => {
+export default (client) => {
+  schedule("30 18 * * *", async () => {
     try {
       const limit = parseInt(process.env.MSG_LIMIT);
       const usersToUpdate = await User.find({ msgCount: { $gt: limit } });
