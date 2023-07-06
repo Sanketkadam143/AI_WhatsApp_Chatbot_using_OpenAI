@@ -4,11 +4,6 @@ FROM node:18.7.0
 # Set the working directory
 WORKDIR /app
 
-# Install ffmpeg
-RUN apt-get update -y && \
-    apt-get upgrade -y && \
-    apt-get install ffmpeg -y
-
 # Copy the package.json and package-lock.json files
 COPY package*.json ./
 
