@@ -32,6 +32,7 @@ async function bot() {
     // await addUser(client);
     // await customMessage(client);
     client.on("message", async (msg) => {
+      console.log(msg)
       const { body, _data } = msg;
       const { me } = client.info;
       const isMention = body.includes(`@${me.user}`);
