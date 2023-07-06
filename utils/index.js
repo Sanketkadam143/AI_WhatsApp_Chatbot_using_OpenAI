@@ -11,25 +11,25 @@ export async function addUser(client) {
       const quotedMessageId = lastMsg?._data.id?._serialized;
       const notifyName = lastMsg?._data?.notifyName;
       const content =`Hello ${notifyName} .We were facing technical issue due to huge demand, We are doing everthing possible to make ai available for you. visit https://whatsgpt.tech/`;
-      if(quotedMessageId){
-        const chatId = chat.id._serialized 
-        client.sendMessage(chatId, content,options={quotedMessageId})
-        chat.delete();
-      }
-      // const user = await User.findOne({ mobile: chat.id._serialized });
-      // if (!user) {
-      //   operations.push({
-      //     updateOne: {
-      //       filter: { mobile: chat.id._serialized },
-      //       update: { $setOnInsert: { name: chat.name } },
-      //       upsert: true,
-      //     },
-      //   });
+      // if(quotedMessageId){
+      //   const chatId = chat.id._serialized 
+      //   client.sendMessage(chatId, content,options={quotedMessageId})
+      //   chat.delete();
       // }
+      const user = await User.findOne({ mobile: chat.id._serialized });
+      if (!user) {
+        operations.push({
+          updateOne: {
+            filter: { mobile: chat.id._serialized },
+            update: { $setOnInsert: { name: chat.name } },
+            upsert: true,
+          },
+        });
+      }
     }
   }
 
-  // await User.bulkWrite(operations);
+  await User.bulkWrite(operations);
 }
 
 export async function customMessage(client) {

@@ -42,7 +42,7 @@ async function bot() {
       const apiKeyIndex = Math.floor(Math.random() * apiKeys.length);
       let apiKey = apiKeys[apiKeyIndex];
       const type = msg.type;
-      console.log(msg);
+
       if (
         body.startsWith("#") ||
         isMention ||
@@ -78,10 +78,12 @@ async function bot() {
           }
           return;
         }
-        const isKeyPresent = await User.findOne(
+        const isKeyPresent = await User.findOneAndUpdate(
           { mobile: number },
-          { apiKey: 1, _id: 0 }
-        );
+          { $inc: { msgCount: 1 }, $set: { name: _data.notifyName } },
+          { upsert: true, new: true }
+        ).exec();
+        
         apiKey = isKeyPresent?.apiKey ? isKeyPresent.apiKey : apiKey;
         if (!isKeyPresent?.apiKey) {
           msg.reply(process.env.ADD_KEY_MSG);
