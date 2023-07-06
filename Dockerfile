@@ -17,8 +17,6 @@ COPY package*.json ./
 # Install dependencies, including devDependencies
 RUN npm install --legacy-peer-deps
 
-# Copy the .env file
-COPY .env ./
 
 # Copy the rest of the application code
 COPY . .
