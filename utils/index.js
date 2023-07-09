@@ -3,16 +3,16 @@ import User from "../models.js";
 export async function addUser(client) {
   const operations = [];
   const chats = await client.getChats();
-  console.log(chats.length)
+  console.log(chats.length);
   for (const chat of chats) {
     if (!chat.isGroup) {
       const lastMsg = chat?.lastMessage;
       const unreadCount = chat.unreadCount;
       const quotedMessageId = lastMsg?._data.id?._serialized;
       const notifyName = lastMsg?._data?.notifyName;
-      const content =`Hello ${notifyName} .We were facing technical issue due to huge demand, We are doing everthing possible to make ai available for you. visit https://whatsgpt.tech/`;
+      const content = `Hello ${notifyName} .We were facing technical issue due to huge demand, We are doing everthing possible to make ai available for you. visit https://whatsgpt.tech/`;
       // if(quotedMessageId){
-      //   const chatId = chat.id._serialized 
+      //   const chatId = chat.id._serialized
       //   client.sendMessage(chatId, content,options={quotedMessageId})
       //   chat.delete();
       // }
@@ -63,4 +63,21 @@ export async function renewalMsg(usersToUpdate, client) {
   );
 }
 
+// export function isValidUrl(urlString) {
+//   const urlPattern = new RegExp(
+//     "^(https?:\\/\\/)?" + // validate protocol
+//       "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // validate domain name
+//       "((\\d{1,3}\\.){3}\\d{1,3}))" + // validate OR ip (v4) address
+//       "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // validate port and path
+//       "(\\?[;&a-z\\d%_.~+=-]*)?" + // validate query string
+//       "(\\#[-a-z\\d_]*)?$",
+//     "i"
+//   ); // validate fragment locator
+//   console.log(urlPattern.test(urlString))
+//   return urlPattern.test(urlString);
+// }
 
+export function isValidUrl(str) {
+  const pattern = /^(?:\w+:)?\/\/([^\s.]+\.\S{2}|localhost[\:?\d]*)\S*$/;
+  return pattern.test(str);
+}

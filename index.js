@@ -11,9 +11,9 @@ import {
   speechToText,
 } from "./apis.js";
 import User from "./models.js";
-import { addUser, customMessage } from "./utils/index.js";
+import { addUser, customMessage, isValidUrl } from "./utils/index.js";
 import resetCredit from "./utils/cronJob.js";
-import createEmbeddings from "./custom_gpt/embeddings.js";
+import { createEmbeddings, webEmbeddings } from "./custom_gpt/embeddings.js";
 import search from "./custom_gpt/docsearch.js";
 config();
 
@@ -32,7 +32,7 @@ async function bot() {
     // await addUser(client);
     // await customMessage(client);
     client.on("message", async (msg) => {
-      console.log(msg)
+      console.log(msg);
       const { body, _data } = msg;
       const { me } = client.info;
       const isMention = body.includes(`@${me.user}`);
@@ -43,6 +43,25 @@ async function bot() {
       const apiKeyIndex = Math.floor(Math.random() * apiKeys.length);
       let apiKey = apiKeys[apiKeyIndex];
       const type = msg.type;
+
+      if (body.startsWith("#") || isMention || !isgrp && type=="chat") {
+        const index = responses.findIndex((response) =>
+          body.startsWith("#")
+            ? body.substring(1).toLowerCase() == response.que.toLowerCase()
+            : body.toLowerCase() == response.que.toLowerCase()
+        );
+        if (index >= 0) {
+          msg.reply(responses[index].ans);
+          return
+        } else if (body.length < 10) {
+          if (_data.notifyName) {
+            msg.reply(
+              `Hey ${_data.notifyName} please be more brief to generate accurate response.`
+            );
+          }
+          return
+        }
+      }
 
       if (
         body.startsWith("#") ||
@@ -79,16 +98,15 @@ async function bot() {
           }
           return;
         }
-        const isKeyPresent = await User.findOneAndUpdate(
+        const isKeyPresent = await User.findOne(
           { mobile: number },
-          { $inc: { msgCount: 1 }, $set: { name: _data.notifyName } },
-          { upsert: true, new: true }
-        ).exec();
-        
+          { apiKey: 1, _id: 0 }
+        );
+
         apiKey = isKeyPresent?.apiKey ? isKeyPresent.apiKey : apiKey;
         if (!isKeyPresent?.apiKey) {
-          msg.reply(process.env.ADD_KEY_MSG);
-          return;
+          // msg.reply(process.env.ADD_KEY_MSG);
+          // return;
           const user = await User.findOneAndUpdate(
             { mobile: number },
             { $inc: { msgCount: 1 }, $set: { name: _data.notifyName } },
@@ -110,11 +128,26 @@ async function bot() {
       const openai = new OpenAIApi(configuration);
 
       switch (true) {
+        case !isgrp && isValidUrl(body):
+          try {
+            chat.sendStateTyping();
+            msg.reply("You will be notified once the embeddings are created");
+            const embed = await webEmbeddings(msg, number, apiKey);
+            if (embed) {
+              msg.reply("Embedding for the document created successfully");
+            } else {
+              return;
+            }
+          } catch (error) {
+            msg.reply("Unable to create embedding");
+            console.log(error);
+          }
+          break;
         case !isgrp && hasMedia && type === "document":
           try {
             chat.sendStateTyping();
             msg.reply("You will be notified once the embeddings are created");
-            const embed = await createEmbeddings(msg,number,apiKey);
+            const embed = await createEmbeddings(msg, number, apiKey);
             if (embed) {
               msg.reply("Embedding for the document created successfully");
             } else {
@@ -183,30 +216,18 @@ async function bot() {
           }
           break;
         case body.startsWith("#") || isMention || !isgrp:
-          const index = responses.findIndex((response) =>
-            body.startsWith("#")
-              ? body.substring(1).toLowerCase() == response.que.toLowerCase()
-              : body.toLowerCase() == response.que.toLowerCase()
-          );
-          if (index >= 0) {
-            msg.reply(responses[index].ans);
-          } else if (body.length < 10) {
-            if (_data.notifyName) {
-              msg.reply(
-                `Hey ${_data.notifyName} please be more brief to generate accurate response.`
-              );
-            }
-          } else if( body.startsWith("/")){
-            const trained_res = await search(number, body,apiKey);
+         if (body.startsWith("/")) {
+            chat.sendStateTyping();
+            const trained_res = await search(number, body, apiKey);
             msg.reply(trained_res);
             return;
-          } else  {
+          } else {
             const prompt = isMention
               ? body.substring(me.user.length + 1)
               : body.startsWith("#")
               ? body.substring(1)
               : body;
-            const pastMessages = await chat.fetchMessages({ limit: 10 });
+            const pastMessages = await chat.fetchMessages({ limit: 5 });
             const filteredMessages = pastMessages.filter(
               (msg) => !msg.hasMedia
             );

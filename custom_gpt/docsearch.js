@@ -6,9 +6,9 @@ import { mongoose } from "mongoose";
 import { config } from "dotenv";
 config();
 
-async function search(number, query, apiKey) {
+const  database = mongoose.connection;
 
-  let database = mongoose.connection;
+async function search(number, query, apiKey) {
 
   const model = new OpenAI({
     openAIApiKey: apiKey,
