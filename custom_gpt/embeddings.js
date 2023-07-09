@@ -116,6 +116,7 @@ export async function webEmbeddings(msg, number, apiKey){
   const  loader = new PuppeteerWebBaseLoader(body, {
     launchOptions: {
       headless: true,
+      args: ['--no-sandbox']
     },
     gotoOptions: {
       waitUntil: "domcontentloaded",
