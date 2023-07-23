@@ -32,7 +32,7 @@ async function bot() {
     // await addUser(client);
     // await customMessage(client);
     client.on("message", async (msg) => {
-      console.log(msg);
+ 
       const { body, _data } = msg;
       const { me } = client.info;
       const isMention = body.includes(`@${me.user}`);
@@ -131,30 +131,30 @@ async function bot() {
         case !isgrp && isValidUrl(body):
           try {
             chat.sendStateTyping();
-            msg.reply("You will be notified once the embeddings are created");
+            msg.reply("You will be notified once the AI is train on given website");
             const embed = await webEmbeddings(msg, number, apiKey);
             if (embed) {
-              msg.reply("Embedding for the document created successfully");
+              msg.reply("AI training successful, You can ask questions to train AI by starting your question with / , eg. /what is the document  about? ");
             } else {
               return;
             }
           } catch (error) {
-            msg.reply("Unable to create embedding");
+            msg.reply("Unable to train AI");
             console.log(error);
           }
           break;
         case !isgrp && hasMedia && type === "document":
           try {
             chat.sendStateTyping();
-            msg.reply("You will be notified once the embeddings are created");
+            msg.reply("You will be notified once the AI is train on given document");
             const embed = await createEmbeddings(msg, number, apiKey);
             if (embed) {
-              msg.reply("Embedding for the document created successfully");
+              msg.reply("AI training successful, You can ask questions to train AI by starting your question with / , eg. /what is the document  about? ");
             } else {
               return;
             }
           } catch (error) {
-            msg.reply("Unable to create embedding");
+            msg.reply("Unable to train AI");
             console.log(error);
           }
           break;

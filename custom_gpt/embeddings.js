@@ -10,6 +10,8 @@ import { mongoose } from "mongoose";
 import { config } from "dotenv";
 import fs from "fs";
 import path from "path";
+import XLSX from "xlsx";
+
 config();
 
 const database = mongoose.connection;
@@ -52,9 +54,7 @@ export async function createEmbeddings(msg, number, apiKey) {
       splitPages: false,
     });
   } else if (mimetype === "text/csv") {
-    loader = new CSVLoader(finalPath, {
-      splitPages: false,
-    });
+    loader = new CSVLoader(finalPath);
   } else if (
     mimetype === "application/msword" ||
     mimetype ===
@@ -67,6 +67,29 @@ export async function createEmbeddings(msg, number, apiKey) {
     loader = new TextLoader(finalPath, {
       splitPages: false,
     });
+  } else if (
+    mimetype ===
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  ) {
+    // Read the Excel file
+    const workbook = XLSX.readFile(finalPath);
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+
+    // Convert the worksheet to CSV
+
+    const csvData = XLSX.utils.sheet_to_csv(worksheet);
+
+    // Write the CSV data to a file
+    fs.writeFile(finalPath, csvData, (err) => {
+      if (err) {
+        console.error("Error writing CSV file:", err);
+      } else {
+        console.log("Conversion completed successfully.");
+      }
+    });
+
+    loader = new CSVLoader(finalPath);
   } else {
     msg.reply("File Type not supported");
     fs.unlink(finalPath, (err) => {
@@ -79,9 +102,22 @@ export async function createEmbeddings(msg, number, apiKey) {
   }
 
   const data = await loader.load();
-  const text = data[0]?.pageContent;
-  const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 });
-  const docs = await textSplitter.createDocuments([text]);
+  let docs = [];
+
+  if (
+    mimetype === "text/plain" ||
+    mimetype === "text/csv" ||
+    mimetype ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  ) {
+    docs = data;
+  } else {
+    const text = data[0]?.pageContent;
+    const textSplitter = new RecursiveCharacterTextSplitter({
+      chunkSize: 1000,
+    });
+    docs = await textSplitter.createDocuments([text]);
+  }
 
   const dbConfig = {
     collection: database.collection("sanket_vectordb"),
@@ -110,13 +146,12 @@ export async function createEmbeddings(msg, number, apiKey) {
   return true;
 }
 
-
-export async function webEmbeddings(msg, number, apiKey){
+export async function webEmbeddings(msg, number, apiKey) {
   const body = msg._data.body;
-  const  loader = new PuppeteerWebBaseLoader(body, {
+  const loader = new PuppeteerWebBaseLoader(body, {
     launchOptions: {
       headless: true,
-      args: ['--no-sandbox']
+      args: ["--no-sandbox"],
     },
     gotoOptions: {
       waitUntil: "domcontentloaded",
@@ -155,5 +190,3 @@ export async function webEmbeddings(msg, number, apiKey){
   );
   return true;
 }
-
-
