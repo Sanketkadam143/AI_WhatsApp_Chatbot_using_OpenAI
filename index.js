@@ -34,7 +34,7 @@ mongoose
     compressors: ["snappy"],
   })
   .then(() => {
-    // bot();
+    bot();
     app.listen(PORT, () =>
       console.log(`Server Running on Port: http://localhost:${PORT}`)
     );
