@@ -1,5 +1,5 @@
 import { schedule } from "node-cron";
-import User from "../models.js";
+import User from "../models/models.js";
 import { Configuration, OpenAIApi } from "openai";
 import { gptResponse } from "../apis.js";
 import { renewalMsg } from "./index.js";

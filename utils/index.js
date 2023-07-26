@@ -1,4 +1,4 @@
-import User from "../models.js";
+import User from "../models/models.js";
 
 export async function addUser(client) {
   const operations = [];
