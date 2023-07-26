@@ -5,7 +5,7 @@ import upload from '../middleware/multer.js';
 
 const  router=express.Router();
 
-router.post('/',upload.single("file"),createEmbeddings);
-router.get('/',queryEmbeddings);
+router.post('/train-gpt',upload.single("file"),createEmbeddings);
+router.post('/query-train-gpt',queryEmbeddings);
 
 export default router;

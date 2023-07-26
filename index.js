@@ -23,8 +23,8 @@ app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 
 //apis for web-bot
-app.use("/train-gpt", webBotRoutes);
-app.use("/query-train-gpt", webBotRoutes);
+app.use("/api", webBotRoutes);
+
 
 mongoose.set("strictQuery", false);
 mongoose
@@ -34,7 +34,7 @@ mongoose
     compressors: ["snappy"],
   })
   .then(() => {
-    bot();
+    // bot();
     app.listen(PORT, () =>
       console.log(`Server Running on Port: http://localhost:${PORT}`)
     );

@@ -26,16 +26,11 @@ export const createEmbeddings = async (req, res) => {
   }
   const number = JSON.parse(req.body.number);
   try {
-    let filename = req.file.originalname.replace(/\s/g, "");
-    filename = filename.toLowerCase();
-    filename = filename.replace(/[^a-z0-9.]/g, "-");
-    filename = filename.replace(/-+/g, "-").replace(/^-|-$/g, "");
-    const uniqueSuffix = Date.now();
-    filename = uniqueSuffix + "-" + filename;
+    let filename = req.file.originalname
 
     const filePath = path.resolve(__dirname, "..", "media", filename);
-
-    fs.writeFile(filePath, req.file.buffer, (err) => {
+    const buffer = Buffer.from(req.file.buffer);
+    fs.writeFile(filePath, buffer, (err) => {
       if (err) {
         console.log(err);
         return res.status(500).json({ message: "Error in uploading pdf" });
