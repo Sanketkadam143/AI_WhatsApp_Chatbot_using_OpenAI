@@ -9,6 +9,7 @@ import {
   dalleResponse,
   gptResponse,
   speechToText,
+  customGPT,
 } from "./apis.js";
 import User from "./models/models.js";
 import { addUser, customMessage, isValidUrl } from "./utils/index.js";
@@ -239,7 +240,8 @@ export async function bot() {
             chat.sendStateTyping();
             try {
               const prompt = pastinfo;
-              const result = await gptResponse(prompt, openai);
+              //const result = await gptResponse(prompt, openai);
+              const result = await customGPT(prompt)
               msg.reply(result);
               chat.clearState();
             } catch (error) {

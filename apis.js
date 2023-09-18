@@ -4,9 +4,11 @@ import ffmpeg from "fluent-ffmpeg";
 import { Readable } from "stream";
 import dotenv from "dotenv";
 import fs from "fs";
+import GPTModel from "./custom_gpt/gpt.js";
 dotenv.config();
 const { path: ffmpegExecutable } = ffmpegPath;
 ffmpeg.setFfmpegPath(ffmpegExecutable);
+const custom_gpt = new GPTModel();
 
 export async function gptResponse(prompt, openai, type) {
   try {
@@ -15,13 +17,23 @@ export async function gptResponse(prompt, openai, type) {
       messages: prompt,
       max_tokens: 1000,
     });
-    console.log(completion)
+    console.log(completion);
     return completion.choices[0].message.content;
   } catch (err) {
     console.error(err);
     if (type === "testing") {
       return "Invalid";
     }
+    return "AI is unavailable";
+  }
+}
+
+export async function customGPT(prompt) {
+  try {
+    const completion = await custom_gpt.generateResponse(prompt);
+    return completion.response.choices[0].message.content;
+  } catch (error) {
+    console.log(error);
     return "AI is unavailable";
   }
 }
@@ -60,9 +72,9 @@ export async function speechToText(audioData, openai, number) {
 
     const response = await openai.audio.transcriptions.create({
       file: fs.createReadStream(filename),
-      model: "whisper-1"
+      model: "whisper-1",
     });
-    console.log(response,"audio transcrip response")
+    console.log(response, "audio transcrip response");
     const transcription = response.text;
 
     fs.unlink(filename, (err) => {
@@ -85,8 +97,8 @@ export async function dalleResponse(prompt, openai) {
       n: 1,
       size: "256x256",
     });
-    console.log(response)
-    const image_url = response.data[0].url
+    console.log(response);
+    const image_url = response.data[0].url;
     return image_url;
   } catch (error) {
     console.log(error);
@@ -142,5 +154,3 @@ export function imageToText(base64) {
     }
   });
 }
-
-

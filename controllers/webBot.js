@@ -6,13 +6,13 @@ import { MongoDBAtlasVectorSearch } from "../langchain/vectorstores/mongodb_atla
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { OpenAI } from "langchain/llms/openai";
 import { RetrievalQAChain } from "langchain/chains";
+import GPTModel from "../custom_gpt/gpt.js";
 import mongoose from "mongoose";
 import { config } from "dotenv";
-
 config();
 
 const database = mongoose.connection;
-
+const custom_gpt = new GPTModel();
 const __dirname = path.dirname(
   new URL(import.meta.url).pathname.replace(/^\/(\w:)/, "$1")
 );
@@ -24,13 +24,18 @@ export const createEmbeddings = async (req, res) => {
   if (!req.file) {
     return res.status(400).send({ message: "please provide a pdf file" });
   }
-  const number = JSON.parse(req.body.number);
+  const number = req.body.number;
   try {
-    let filename = req.file.originalname
+    let filename = req.file.originalname.replace(/\s/g, "");
+    filename = filename.toLowerCase();
+    filename = filename.replace(/[^a-z0-9.]/g, "-");
+    filename = filename.replace(/-+/g, "-").replace(/^-|-$/g, "");
+    const uniqueSuffix = Date.now();
+    filename = uniqueSuffix + "-" + filename;
 
     const filePath = path.resolve(__dirname, "..", "media", filename);
-    const buffer = Buffer.from(req.file.buffer);
-    fs.writeFile(filePath, buffer, (err) => {
+    
+    fs.writeFile(filePath, req.file.buffer, (err) => {
       if (err) {
         console.log(err);
         return res.status(500).json({ message: "Error in uploading pdf" });
@@ -145,3 +150,18 @@ export const queryEmbeddings = async (req, res) => {
     return res.status(500).json({ message: "Error while querying embeddings" });
   }
 };
+
+export const askcustomGPT = async (req, res) => {
+  const { query} = req.body;
+  try {
+    const prompt = [
+      { role: 'system', content: '' },
+      { role: 'user', content: query + '\n' },
+    ]
+   const answer = await custom_gpt.generateResponse(prompt)
+   return res.status(200).json({ response: answer });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error while querying custom model" });
+  }
+}

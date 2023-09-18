@@ -12,12 +12,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const CONNECTION_URL = process.env.MONGODB_URI;
 
-app.use(
-  cors({
-    origin: "*",
-  })
-);
-
+if (process.env.ENVIRONMENT === "local") {
+  app.use(
+    cors({
+      origin: "*",
+    })
+  );
+}
 app.use(express.json());
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
