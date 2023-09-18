@@ -1,4 +1,4 @@
-import pkg from "./whatsapp-web.js/index.js";
+import pkg from "whatsapp-web.js/index.js";
 import qrcode from "qrcode-terminal";
 // Require database
 import { MongoStore } from "wwebjs-mongo";

@@ -10,19 +10,19 @@ ffmpeg.setFfmpegPath(ffmpegExecutable);
 
 export async function gptResponse(prompt, openai, type) {
   try {
-    const completion = await openai.createChatCompletion({
+    const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: prompt,
       max_tokens: 1000,
     });
-    console.log(completion.data.usage)
-    return completion.data.choices[0].message.content;
+    console.log(completion)
+    return completion.choices[0].message.content;
   } catch (err) {
     console.error(err);
     if (type === "testing") {
       return "Invalid";
     }
-    return err.response.statusText;
+    return "AI is unavailable";
   }
 }
 
@@ -58,12 +58,12 @@ export async function speechToText(audioData, openai, number) {
         .run();
     });
 
-    const response = await openai.createTranscription(
-      fs.createReadStream(filename),
-      "whisper-1",
-      "en" //Language
-    );
-    const transcription = response.data.text;
+    const response = await openai.audio.transcriptions.create({
+      file: fs.createReadStream(filename),
+      model: "whisper-1"
+    });
+    console.log(response,"audio transcrip response")
+    const transcription = response.text;
 
     fs.unlink(filename, (err) => {
       if (err) {
@@ -74,21 +74,23 @@ export async function speechToText(audioData, openai, number) {
 
     return transcription;
   } catch (error) {
-    console.log(error.response.status);
+    console.log(error);
   }
 }
 
 export async function dalleResponse(prompt, openai) {
   try {
-    const response = await openai.createImage({
+    const response = await openai.images.generate({
       prompt: prompt,
       n: 1,
       size: "256x256",
     });
-    return (image_url = response.data.data[0].url);
+    console.log(response)
+    const image_url = response.data[0].url
+    return image_url;
   } catch (error) {
-    console.error(error.response.statusText);
-    return error.response.status;
+    console.log(error);
+    return error.response;
   }
 }
 

@@ -1,6 +1,6 @@
-import pkg from "./whatsapp-web.js/index.js";
+import pkg from "whatsapp-web.js/index.js";
 const { MessageMedia } = pkg;
-import { Configuration, OpenAIApi } from "openai";
+import { OpenAI } from "openai";
 import { config } from "dotenv";
 import auth from "./auth.js";
 import responses from "./replies.js";
@@ -73,10 +73,9 @@ export async function bot() {
         if (body.startsWith(prefix)) {
           chat.sendStateTyping();
           const key = body.substring(prefix.length);
-          const configuration = new Configuration({
+          const openai = new OpenAI({
             apiKey: key,
           });
-          const openai = new OpenAIApi(configuration);
           const prompt = [{ role: "user", content: "testing api" }];
           const res = await gptResponse(prompt, openai, "testing");
           if (res === "Invalid") {
@@ -121,11 +120,9 @@ export async function bot() {
       } else {
         return;
       }
-
-      const configuration = new Configuration({
+      const openai = new OpenAI({
         apiKey: apiKey,
       });
-      const openai = new OpenAIApi(configuration);
 
       switch (true) {
         case !isgrp && isValidUrl(body):
