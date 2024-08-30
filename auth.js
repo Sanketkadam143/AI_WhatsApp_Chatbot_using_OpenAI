@@ -12,7 +12,7 @@ export default function auth() {
     try {
       const store = new MongoStore({ mongoose: mongoose });
       store.sessionExists({ session: "RemoteAuth" }).then((exists) => {
-        if (exists) {
+        if (!exists) {
           store
             .extract({
               session: "RemoteAuth",
@@ -27,6 +27,10 @@ export default function auth() {
                 puppeteer: {
                   args: ["--no-sandbox", "--disable-setuid-sandbox"],
                 },
+                webVersionCache: {
+                  type: 'remote',
+                  remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html',
+                  }
               });
               client.initialize();
               client.on("ready", () => {
@@ -43,6 +47,10 @@ export default function auth() {
             puppeteer: {
               args: ["--no-sandbox", "--disable-setuid-sandbox"],
             },
+            webVersionCache: {
+              type: 'remote',
+              remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html',
+              }
           });
           client.initialize();
           client.on("qr", (qr) => {

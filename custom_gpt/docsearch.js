@@ -11,6 +11,7 @@ const  database = mongoose.connection;
 async function search(number, query, apiKey) {
 
   const model = new OpenAI({
+    modelName: "gpt-3.5-turbo",
     openAIApiKey: apiKey,
     temperature: 0.9,
   });

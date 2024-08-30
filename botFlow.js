@@ -18,7 +18,7 @@ import { createEmbeddings, webEmbeddings } from "./custom_gpt/embeddings.js";
 import search from "./custom_gpt/docsearch.js";
 config();
 
-const apiKeyCount = 2;
+const apiKeyCount = 1;
 const apiKeys = [];
 for (let i = 1; i <= apiKeyCount; i++) {
   const apiKey = process.env[`OPENAI_API_KEY_${i}`];
@@ -29,7 +29,7 @@ for (let i = 1; i <= apiKeyCount; i++) {
 export async function bot() {
   try {
     const client = await auth();
-    resetCredit(client);
+    // resetCredit(client);
     // await addUser(client);
     // await customMessage(client);
     client.on("message", async (msg) => {
@@ -75,6 +75,7 @@ export async function bot() {
           chat.sendStateTyping();
           const key = body.substring(prefix.length);
           const openai = new OpenAI({
+            modelName: "gpt-3.5-turbo",
             apiKey: key,
           });
           const prompt = [{ role: "user", content: "testing api" }];
@@ -113,10 +114,10 @@ export async function bot() {
             { upsert: true, new: true }
           ).exec();
 
-          if (user.msgCount > process.env.MSG_LIMIT) {
-            msg.reply(process.env.DAILY_CREDIT_MSG);
-            return;
-          }
+          // if (user.msgCount > process.env.MSG_LIMIT) {
+          //   msg.reply(process.env.DAILY_CREDIT_MSG);
+          //   return;
+          // }
         }
       } else {
         return;
@@ -240,8 +241,8 @@ export async function bot() {
             chat.sendStateTyping();
             try {
               const prompt = pastinfo;
-              //const result = await gptResponse(prompt, openai);
-              const result = await customGPT(prompt)
+              const result = await gptResponse(prompt, openai);
+              //const result = await customGPT(prompt)
               msg.reply(result);
               chat.clearState();
             } catch (error) {
