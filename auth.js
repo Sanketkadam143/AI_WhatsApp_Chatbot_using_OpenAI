@@ -1,4 +1,4 @@
-import pkg from "whatsapp-web.js/index.js";
+import pkg from "./whatsapp-web.js/index.js";
 import qrcode from "qrcode-terminal";
 // Require database
 import { MongoStore } from "wwebjs-mongo";
@@ -12,16 +12,19 @@ export default function auth() {
     try {
       const store = new MongoStore({ mongoose: mongoose });
       store.sessionExists({ session: "RemoteAuth" }).then((exists) => {
-        if (!exists) {
+        if (exists) {
           store
             .extract({
               session: "RemoteAuth",
               path: process.env.SESSION_FILE_PATH,
             })
             .then(() => {
+              
               client = new Client({
                 authStrategy: new RemoteAuth({
                   store: store,
+                  clientId:"",
+                  dataPath:"",
                   backupSyncIntervalMs: 3600000,
                 }),
                 puppeteer: {
@@ -32,6 +35,7 @@ export default function auth() {
                   remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html',
                   }
               });
+              console.log("before initialize")
               client.initialize();
               client.on("ready", () => {
                 console.log("Client is ready!");

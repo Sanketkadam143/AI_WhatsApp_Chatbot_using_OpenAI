@@ -7,6 +7,10 @@ exports.DefaultOptions = {
         headless: true,
         defaultViewport: null
     },
+    webVersion: '2.2346.52',
+    webVersionCache: {
+        type: 'local',
+    },
     authTimeoutMs: 0,
     qrMaxRetries: 0,
     takeoverOnConflict: false,
@@ -40,10 +44,12 @@ exports.Events = {
     CHAT_REMOVED: 'chat_removed',
     CHAT_ARCHIVED: 'chat_archived',
     MESSAGE_RECEIVED: 'message',
+    MESSAGE_CIPHERTEXT: 'message_ciphertext',
     MESSAGE_CREATE: 'message_create',
     MESSAGE_REVOKED_EVERYONE: 'message_revoke_everyone',
     MESSAGE_REVOKED_ME: 'message_revoke_me',
     MESSAGE_ACK: 'message_ack',
+    MESSAGE_EDIT: 'message_edit',
     UNREAD_COUNT: 'unread_count',
     MESSAGE_REACTION: 'message_reaction',
     MEDIA_UPLOADED: 'media_uploaded',
@@ -51,6 +57,7 @@ exports.Events = {
     GROUP_JOIN: 'group_join',
     GROUP_LEAVE: 'group_leave',
     GROUP_ADMIN_CHANGED: 'group_admin_changed',
+    GROUP_MEMBERSHIP_REQUEST: 'group_membership_request',
     GROUP_UPDATE: 'group_update',
     QR_RECEIVED: 'qr',
     LOADING_SCREEN: 'loading_screen',
@@ -58,7 +65,8 @@ exports.Events = {
     STATE_CHANGED: 'change_state',
     BATTERY_CHANGED: 'change_battery',
     INCOMING_CALL: 'call',
-    REMOTE_SESSION_SAVED: 'remote_session_saved'
+    REMOTE_SESSION_SAVED: 'remote_session_saved',
+    VOTE_UPDATE: 'vote_update'
 };
 
 /**
@@ -102,6 +110,7 @@ exports.MessageTypes = {
     PROTOCOL: 'protocol',
     REACTION: 'reaction',
     TEMPLATE_BUTTON_REPLY: 'template_button_reply',
+    POLL_CREATION: 'poll_creation',
 };
 
 /**
